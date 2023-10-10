@@ -26,8 +26,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             frame.setSize(1366, 768);
             frame.setLocationRelativeTo(null);
-            GamePanel gamePanel = new GamePanel();
-            frame.add(gamePanel);
+            frame.add(this);
             frame.setVisible(true);
         });
         
