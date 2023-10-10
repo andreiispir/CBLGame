@@ -7,6 +7,9 @@ import java.util.List;
 import java.util.Random;
 
 public class GamePanel extends JPanel implements ActionListener, KeyListener {
+
+    protected Image walkImg = new ImageIcon(".png").getImage(); // Walking right
+
     private int characterX = 100; // Initial character X position
     private int characterY = 500; // Initial character Y position
     private int characterSpeedY = 0; // Character's vertical speed
@@ -119,6 +122,9 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         }
 
         Toolkit.getDefaultToolkit().sync();
+
+        Graphics2D g2d = (Graphics2D) g;
+        g2d.drawImage(walkImg, characterX, characterY, this);
     }
 
     @Override
