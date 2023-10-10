@@ -17,8 +17,7 @@ public class StartMenu extends JPanel {
         startGame.add(b);
         startGame.setVisible(true);
 
-        b.addActionListener(new ActionListener() 
-        {
+        b.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 startGame.setVisible(false);
                 new GamePanel().setVisible(true); // Main Form to show after the Login Form..
