@@ -20,7 +20,7 @@ public class StartMenu extends JPanel {
         b.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 startGame.setVisible(false);
-                new GamePanel().setVisible(true); // Main Form to show after the Login Form..
+                new GamePanel().setVisible(true);
             }
         });
     }
