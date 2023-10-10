@@ -21,6 +21,16 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
 
 
     public GamePanel() {
+        SwingUtilities.invokeLater(() -> {
+            JFrame frame = new JFrame("Side Scroller Game");
+            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            frame.setSize(1366, 768);
+            frame.setLocationRelativeTo(null);
+            GamePanel gamePanel = new GamePanel();
+            frame.add(gamePanel);
+            frame.setVisible(true);
+        });
+        
         timer = new Timer(20, this); // Timer for the game loop
         timer.start();
 
