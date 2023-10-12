@@ -77,8 +77,8 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if (isJumping) {
-            characterSpeedY = -5; // Move character upwards during jump
-            jumpHeight -= 5;
+            characterSpeedY = -15; // Move character upwards during jump
+            jumpHeight -= 15;
             if (jumpHeight <= 0) {
                 isJumping = false;
             }
@@ -191,7 +191,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
             // Start the jump when SPACE key is pressed, and not already jumping,
             // and character is on the ground or can jump
             isJumping = true;
-            jumpHeight = 80;
+            jumpHeight = 110;
             canJump = false; // Disable jumping until the player lands
         }
     }
