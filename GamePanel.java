@@ -150,9 +150,8 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
             generateObstacleLevel1();
             lastObstacleTimeLevel1 = System.currentTimeMillis();
         }
-
         // Generate new obstacles for Level 2
-        if (System.currentTimeMillis() - lastObstacleTimeLevel2 >= 1200) {
+        if (System.currentTimeMillis() - lastObstacleTimeLevel2 >= 1300) {
             generateObstacleLevel2();
             lastObstacleTimeLevel2 = System.currentTimeMillis();
         }
