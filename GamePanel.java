@@ -10,7 +10,8 @@ import java.util.Timer;
 
 public class GamePanel extends JPanel implements ActionListener, KeyListener {
 
-    protected Image walkImg = new ImageIcon("characterIdle.png").getImage(); // Walking right
+    protected Image walkImg = new ImageIcon("output-onlinegiftools.gif").getImage(); // Walking right
+    protected Image platformImage = new ImageIcon("platformvar1.png").getImage(); // Platform image
 
     private int characterX = 100; // Initial character X position
     private int characterY = 500; // Initial character Y position
@@ -167,12 +168,14 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
 
         g.setColor(Color.RED); // Set the color to red for Level 1 obstacles
         for (Obstacle obstacle : obstaclesLevel1) {
-            g.fillRect(obstacle.getX(), obstacle.getY(), obstacle.getWidth(), obstacle.getHeight());
+            //g.fillRect(obstacle.getX(), obstacle.getY(), obstacle.getWidth(), obstacle.getHeight());
+            g.drawImage(platformImage, obstacle.getX(), obstacle.getY(), this);
         }
 
         g.setColor(Color.GREEN); // Set the color to green for Level 2 obstacles
         for (Obstacle obstacle : obstaclesLevel2) {
-            g.fillRect(obstacle.getX(), obstacle.getY(), obstacle.getWidth(), obstacle.getHeight());
+            //g.fillRect(obstacle.getX(), obstacle.getY(), obstacle.getWidth(), obstacle.getHeight());
+            g.drawImage(platformImage, obstacle.getX(), obstacle.getY(), this);
         }
 
         Toolkit.getDefaultToolkit().sync();
