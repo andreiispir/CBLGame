@@ -17,6 +17,10 @@ public class Obstacle {
         x -= speed;
     }
 
+    public void addObstacle() {
+        
+    }
+
     public int getX() {
         return x;
     }
