@@ -12,6 +12,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
 
     protected Image walkImg = new ImageIcon("output-onlinegiftools.gif").getImage(); // Walking right
     protected Image platformImage = new ImageIcon("platformvar1.png").getImage(); // Platform image
+    protected Image largePlatformImage = new ImageIcon("platformvar2.png").getImage(); // Larger platform image
 
     private int characterX = 100; // Initial character X position
     private int characterY = 500; // Initial character Y position
@@ -27,6 +28,8 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
     private List<Obstacle> obstaclesLevel1 = new ArrayList<>();
     private List<Obstacle> obstaclesLevel2 = new ArrayList<>();
     private Random random = new Random();
+    private int jumpCount = 0; // Track the number of jumps
+    private static final int MAX_JUMP_COUNT = 2; // Maximum allowed jumps (including the initial jump)
 
     public GamePanel() {
         SwingUtilities.invokeLater(() -> {
@@ -61,14 +64,14 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
     }
 
     public void generateObstacleLevel1() {
-        int obstacleWidth = 60 + random.nextInt(20);
+        int obstacleWidth = 80 + random.nextInt(20);
         int obstacleHeight = 50;
         Obstacle obstacle = new Obstacle(getWidth(), 500, obstacleWidth, obstacleHeight);
         obstaclesLevel1.add(obstacle);
     }
 
     public void generateObstacleLevel2() {
-        int obstacleWidth = 60 + random.nextInt(20);
+        int obstacleWidth = 70 + random.nextInt(20);
         int obstacleHeight = 50;
         Obstacle obstacle = new Obstacle(getWidth(), 450, obstacleWidth, obstacleHeight);
         obstaclesLevel2.add(obstacle);
@@ -82,7 +85,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
             if (jumpHeight <= 0) {
                 isJumping = false;
             }
-        } else {
+        } else{
             characterSpeedY = 5; // Apply gravity when not jumping
         }
 
@@ -91,9 +94,9 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         if (characterY > 500) {
             characterY = 500;
             characterSpeedY = 0;
-            canJump = true; // Enable jumping when the player lands
+            canJump = true;
+            jumpCount = 0; // Reset jump count when character lands
         }
-
         characterRect.setBounds(characterX, characterY, 50, 50);
 
         Iterator<Obstacle> iteratorLevel1 = obstaclesLevel1.iterator();
@@ -147,12 +150,12 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         }
 
         // Generate new obstacles for Level 1
-        if (System.currentTimeMillis() - lastObstacleTimeLevel1 >= 850) {
+        if (System.currentTimeMillis() - lastObstacleTimeLevel1 >= 1000) {
             generateObstacleLevel1();
             lastObstacleTimeLevel1 = System.currentTimeMillis();
         }
         // Generate new obstacles for Level 2
-        if (System.currentTimeMillis() - lastObstacleTimeLevel2 >= 1300) {
+        if (System.currentTimeMillis() - lastObstacleTimeLevel2 >= 1200) {
             generateObstacleLevel2();
             lastObstacleTimeLevel2 = System.currentTimeMillis();
         }
@@ -169,7 +172,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         g.setColor(Color.RED); // Set the color to red for Level 1 obstacles
         for (Obstacle obstacle : obstaclesLevel1) {
             //g.fillRect(obstacle.getX(), obstacle.getY(), obstacle.getWidth(), obstacle.getHeight());
-            g.drawImage(platformImage, obstacle.getX(), obstacle.getY(), this);
+            g.drawImage(largePlatformImage, obstacle.getX(), obstacle.getY(), this);
         }
 
         g.setColor(Color.GREEN); // Set the color to green for Level 2 obstacles
@@ -187,13 +190,16 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
     @Override
     public void keyPressed(KeyEvent e) {
         int key = e.getKeyCode();
-        if (key == KeyEvent.VK_SPACE && !isJumping && (characterY >= 500 || canJump)) {
+    if (key == KeyEvent.VK_SPACE) {
+        if (!isJumping && (characterY >= 500 || canJump || jumpCount < MAX_JUMP_COUNT)) {
             // Start the jump when SPACE key is pressed, and not already jumping,
-            // and character is on the ground or can jump
+            // and character is on the ground or can jump or has available jumps
             isJumping = true;
-            jumpHeight = 110;
+            jumpHeight = (jumpCount == 0) ? 110 : 80; // Different jump heights for initial and double jumps
             canJump = false; // Disable jumping until the player lands
+            jumpCount++; // Increment the jump count
         }
+    }
     }
 
     @Override
