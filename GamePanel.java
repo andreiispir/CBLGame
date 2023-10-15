@@ -50,7 +50,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         characterRect = new Rectangle(characterX, characterY, 50, 50);
 
         // Load background image
-        backgroundImage = new ImageIcon("background.png").getImage(); // Change to your background image path
+        backgroundImage = new ImageIcon("background2.png").getImage(); // Change to your background image path
 
         // Add the KeyListener to the game panel
         addKeyListener(this);
