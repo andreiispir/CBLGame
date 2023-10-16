@@ -33,6 +33,8 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
     private static final int MAX_JUMP_COUNT = 2; // Maximum allowed jumps (including the initial jump)
     private List<Coin> coins = new ArrayList<>();
     private int collectedCoins = 0; // Counter for collected coins
+    private boolean onPlatform = false; // Flag to track if the character is on a platform
+    private boolean canDoubleJump = false; // Flag to track if the character can perform a double jump
 
     public GamePanel() {
         SwingUtilities.invokeLater(() -> {
@@ -75,14 +77,14 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
     public void generateObstacleLevel1() {
         int obstacleWidth =random.nextInt(20) + 90;
         int obstacleHeight = 50;
-        Obstacle obstacle = new Obstacle(getWidth(), 500, obstacleWidth, obstacleHeight);
+        Obstacle obstacle = new Obstacle(getWidth() + 1300, 500, obstacleWidth, obstacleHeight);
         obstaclesLevel1.add(obstacle);
     }
 
     public void generateObstacleLevel2() {
         int obstacleWidth = 70 + random.nextInt(20);
         int obstacleHeight = 50;
-        Obstacle obstacle = new Obstacle(getWidth(), 450, obstacleWidth, obstacleHeight);
+        Obstacle obstacle = new Obstacle(getWidth() + 1300, 450, obstacleWidth, obstacleHeight);
         obstaclesLevel2.add(obstacle);
     }
 
@@ -107,6 +109,14 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
             jumpCount = 0; // Reset jump count when character lands
         }
         characterRect.setBounds(characterX, characterY, 50, 50);
+
+        // Check if the character is on a platform
+        if (characterY == 500 && !isJumping) {
+            onPlatform = true;
+            canDoubleJump = true; // Reset the ability to double jump when on a platform
+        } else {
+            onPlatform = false;
+        }
 
         Iterator<Obstacle> iteratorLevel1 = obstaclesLevel1.iterator();
         while (iteratorLevel1.hasNext()) {
@@ -216,13 +226,16 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
     public void keyPressed(KeyEvent e) {
         int key = e.getKeyCode();
     if (key == KeyEvent.VK_SPACE) {
-        if (!isJumping && (characterY >= 500 || canJump || jumpCount < MAX_JUMP_COUNT)) {
+        if (onPlatform || canJump || (canDoubleJump && jumpCount < MAX_JUMP_COUNT)) {
             // Start the jump when SPACE key is pressed, and not already jumping,
             // and character is on the ground or can jump or has available jumps
             isJumping = true;
             jumpHeight = (jumpCount == 0) ? 110 : 80; // Different jump heights for initial and double jumps
             canJump = false; // Disable jumping until the player lands
             jumpCount++; // Increment the jump count
+            if (onPlatform) {
+                canDoubleJump = true; // Allow a double jump when on a platform
+            }
         }
     }
     }
