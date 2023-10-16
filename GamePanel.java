@@ -66,9 +66,6 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         // Load coin image
         coinImg = coinImg.getScaledInstance(35, 35, Image.SCALE_DEFAULT);
 
-         // Generate coins
-         generateCoins();
-
         // Request focus for the game panel to enable keyboard input
         setFocusable(true);
         requestFocus();
@@ -203,7 +200,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
             lastObstacleTimeLevel1 = System.currentTimeMillis();
         }
         // Generate new obstacles for Level 2
-        if (System.currentTimeMillis() - lastObstacleTimeLevel2 >= 1200) {
+        if (System.currentTimeMillis() - lastObstacleTimeLevel2 >= 1600) {
             generateObstacleLevel2();
             lastObstacleTimeLevel2 = System.currentTimeMillis();
         }
@@ -266,29 +263,6 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
     }
     }
 
-    private void generateCoins() {
-        // Generate coins on platforms
-        // For simplicity, we'll add a few coins to each platform in this example
-        // for (Obstacle obstacle : obstaclesLevel1) {
-        //     int numCoins = random.nextInt(3) + 1; // Generate 1 to 3 coins per platform
-        //     for (int i = 0; i < numCoins; i++) {
-        //         int coinX = obstacle.getX() + random.nextInt(obstacle.getWidth() - 30); // Adjust as needed
-        //         int coinY = obstacle.getY() - 30; // Place the coin above the platform
-        //         Coin coin = new Coin(coinX, coinY);
-        //         coins.add(coin);
-        //     }
-            
-        // }
-        // for (Obstacle obstacle : obstaclesLevel2) {
-        //     int numCoins = random.nextInt(3) + 1; // Generate 1 to 3 coins per platform
-        //     for (int i = 0; i < numCoins; i++) {
-        //         int coinX = obstacle.getX() + random.nextInt(obstacle.getWidth() - 30); // Adjust as needed
-        //         int coinY = obstacle.getY() - 30; // Place the coin above the platform
-        //         Coin coin = new Coin(coinX, coinY);
-        //         coins.add(coin);
-        //     }
-        // }
-    }
     private void checkCoinCollection() {
         Rectangle characterRect = new Rectangle(characterX, characterY, 50, 50);
         Iterator<Coin> iterator = coins.iterator();
