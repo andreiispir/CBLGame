@@ -13,6 +13,8 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
     protected Image walkImg = new ImageIcon("output-onlinegiftools.gif").getImage(); // Walking right
     protected Image platformImage = new ImageIcon("platformvar1.png").getImage(); // Platform image
     protected Image coinImage = new ImageIcon("coin.gif").getImage(); // Coin image
+    protected Image largePlatformImage = new ImageIcon("platformvar2.png").getImage(); // Larger platform image
+    protected Image coinImg = new ImageIcon("coinAnim2.gif").getImage(); // Load coin animation
 
     private int characterX = 100; // Initial character X position
     private int characterY = 500; // Initial character Y position
@@ -31,6 +33,12 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
     private List<Coins> coinsLevel2 = new ArrayList<>();
     private Random random = new Random();
     private Timer coinTimer;
+    private int jumpCount = 0; // Track the number of jumps
+    private static final int MAX_JUMP_COUNT = 2; // Maximum allowed jumps (including the initial jump)
+    private List<Coin> coins = new ArrayList<>();
+    private int collectedCoins = 0; // Counter for collected coins
+    private boolean onPlatform = false; // Flag to track if the character is on a platform
+    private boolean canDoubleJump = false; // Flag to track if the character can perform a double jump
 
     public GamePanel() {
         SwingUtilities.invokeLater(() -> {
@@ -69,7 +77,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
 
         // Load coin image
         coinImg = coinImg.getScaledInstance(35, 35, Image.SCALE_DEFAULT);
-        
+
          // Generate coins
          generateCoins();
 
@@ -243,6 +251,11 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
 
         for (Coins coins : coinsLevel2) {
             g.drawImage(coinImage, coins.getX(), coins.getY(), this);
+        // Draw coins
+        for (Coin coin : coins) {
+            if (coin.isVisible()) {
+                g.drawImage(coinImg, coin.getX(), coin.getY(), this);
+            }
         }
 
         Toolkit.getDefaultToolkit().sync();
