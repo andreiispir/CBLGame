@@ -13,6 +13,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
     protected Image walkImg = new ImageIcon("output-onlinegiftools.gif").getImage(); // Walking right
     protected Image platformImage = new ImageIcon("platformvar1.png").getImage(); // Platform image
     protected Image largePlatformImage = new ImageIcon("platformvar2.png").getImage(); // Larger platform image
+    protected Image coinImg = new ImageIcon("coinAnim2.gif").getImage(); // Load coin animation
 
     private int characterX = 100; // Initial character X position
     private int characterY = 500; // Initial character Y position
@@ -30,6 +31,8 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
     private Random random = new Random();
     private int jumpCount = 0; // Track the number of jumps
     private static final int MAX_JUMP_COUNT = 2; // Maximum allowed jumps (including the initial jump)
+    private List<Coin> coins = new ArrayList<>();
+    private int collectedCoins = 0; // Counter for collected coins
 
     public GamePanel() {
         SwingUtilities.invokeLater(() -> {
@@ -58,13 +61,19 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         // Add the KeyListener to the game panel
         addKeyListener(this);
 
+        // Load coin image
+        coinImg = coinImg.getScaledInstance(35, 35, Image.SCALE_DEFAULT);
+
+         // Generate coins
+         generateCoins();
+
         // Request focus for the game panel to enable keyboard input
         setFocusable(true);
         requestFocus();
     }
 
     public void generateObstacleLevel1() {
-        int obstacleWidth = 80 + random.nextInt(20);
+        int obstacleWidth =random.nextInt(20) + 90;
         int obstacleHeight = 50;
         Obstacle obstacle = new Obstacle(getWidth(), 500, obstacleWidth, obstacleHeight);
         obstaclesLevel1.add(obstacle);
@@ -149,6 +158,9 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
             }
         }
 
+        // Check for coin collection
+        checkCoinCollection();
+
         // Generate new obstacles for Level 1
         if (System.currentTimeMillis() - lastObstacleTimeLevel1 >= 1000) {
             generateObstacleLevel1();
@@ -181,10 +193,23 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
             g.drawImage(platformImage, obstacle.getX(), obstacle.getY(), this);
         }
 
+        // Draw coins
+        for (Coin coin : coins) {
+            if (coin.isVisible()) {
+                g.drawImage(coinImg, coin.getX(), coin.getY(), this);
+            }
+        }
+
         Toolkit.getDefaultToolkit().sync();
 
         Graphics2D g2d = (Graphics2D) g;
         g2d.drawImage(walkImg, characterX, characterY, this);
+
+          // Draw coin counter
+          g.setColor(Color.WHITE);
+          g.setFont(new Font("Arial", Font.PLAIN, 20));
+          g.drawString("Coins: " + collectedCoins, getWidth() - 100, 30);
+  
     }
 
     @Override
@@ -200,6 +225,41 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
             jumpCount++; // Increment the jump count
         }
     }
+    }
+
+    private void generateCoins() {
+        // Generate coins on platforms
+        // For simplicity, we'll add a few coins to each platform in this example
+        for (Obstacle obstacle : obstaclesLevel1) {
+            int numCoins = random.nextInt(3) + 1; // Generate 1 to 3 coins per platform
+            for (int i = 0; i < numCoins; i++) {
+                int coinX = obstacle.getX() + random.nextInt(obstacle.getWidth() - 30); // Adjust as needed
+                int coinY = obstacle.getY() - 30; // Place the coin above the platform
+                Coin coin = new Coin(coinX, coinY);
+                coins.add(coin);
+            }
+        }
+        for (Obstacle obstacle : obstaclesLevel2) {
+            int numCoins = random.nextInt(3) + 1; // Generate 1 to 3 coins per platform
+            for (int i = 0; i < numCoins; i++) {
+                int coinX = obstacle.getX() + random.nextInt(obstacle.getWidth() - 30); // Adjust as needed
+                int coinY = obstacle.getY() - 30; // Place the coin above the platform
+                Coin coin = new Coin(coinX, coinY);
+                coins.add(coin);
+            }
+        }
+    }
+    private void checkCoinCollection() {
+        Rectangle characterRect = new Rectangle(characterX, characterY, 50, 50);
+        Iterator<Coin> iterator = coins.iterator();
+        while (iterator.hasNext()) {
+            Coin coin = iterator.next();
+            Rectangle coinRect = new Rectangle(coin.getX(), coin.getY(), 30, 30);
+            if (characterRect.intersects(coinRect) && coin.isVisible()) {
+                coin.setVisible(false); // Mark the coin as collected
+                collectedCoins++; // Increment the coin counter
+            }
+        }
     }
 
     @Override
