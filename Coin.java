@@ -11,6 +11,10 @@ public class Coin {
         this.speed = 5;
     }
 
+    public void moveCollision() {
+        x -= 3;
+    }
+
     public int getSpeed() {
         return speed;
     }
