@@ -25,7 +25,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
     private Timer timer;
     private long lastPlatformTimeLevel1;
     private long lastPlatformTimeLevel2;
-    private long lastTrapTime;
+    private int platformsCount;
     private Rectangle characterRect;
     private Image backgroundImage;
     private List<Platform> platformsLevel1 = new ArrayList<>();
@@ -97,6 +97,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         int platformHeight = 50;
         Platform platform = new Platform(getWidth()+1000, 450, platformWidth, platformHeight);
         platformsLevel2.add(platform);
+        
 
         int numCoins = random.nextInt(3) + 1; // Generate 1 to 3 coins per platform
         for (int i = 0; i < numCoins; i++) {
@@ -112,7 +113,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         int trapWidth = 30;
         int trapHeight = 30;
 
-
+        
         Trap trap = new Trap(getWidth(), 496, trapWidth, trapHeight);
         traps.add(trap);
     }
@@ -157,6 +158,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
             if (characterY + 50 > platform.getY() && characterY < platform.getY() + platform.getHeight()
                     && characterX + 50 > platform.getX() && characterX < platform.getX() + platform.getWidth()) {
                 // Character is colliding with the platform
+                //platformsCount++;
                 if (characterY > 485 && characterY <= 525) {
                     new GameOver();
                     timer.cancel();
@@ -185,6 +187,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
             if (characterY + 50 > platform.getY() && characterY < platform.getY() + platform.getHeight()
                     && characterX + 50 > platform.getX() && characterX < platform.getX() + platform.getWidth()) {
                 // Character is colliding with the platform
+                //platformsCount++;
                 if (characterY > 410 && characterY <= 450) {
                     new GameOver();
                     timer.cancel();
@@ -214,7 +217,13 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         // Generate new platforms for Level 1
         if (System.currentTimeMillis() - lastPlatformTimeLevel1 >= random.nextInt(1000, 2000)) {
             generatePlatformLevel1();
-            generateTrap();
+            System.out.println(platformsCount + " ");
+
+            if (platformsCount % 5 == 0) {
+                generateTrap();
+            }
+
+
             lastPlatformTimeLevel1 = System.currentTimeMillis();
         }
         // Generate new platforms for Level 2
