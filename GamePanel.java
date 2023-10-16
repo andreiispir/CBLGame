@@ -62,10 +62,16 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         characterRect = new Rectangle(characterX, characterY, 50, 50);
 
         // Load background image
-        backgroundImage = new ImageIcon("background.png").getImage(); // Change to your background image path
+        backgroundImage = new ImageIcon("background2.png").getImage(); // Change to your background image path
 
         // Add the KeyListener to the game panel
         addKeyListener(this);
+
+        // Load coin image
+        coinImg = coinImg.getScaledInstance(35, 35, Image.SCALE_DEFAULT);
+        
+         // Generate coins
+         generateCoins();
 
         // Request focus for the game panel to enable keyboard input
         setFocusable(true);
@@ -73,16 +79,16 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
     }
 
     public void generateObstacleLevel1() {
-        int obstacleWidth = 60 + random.nextInt(20);
+        int obstacleWidth =random.nextInt(20) + 90;
         int obstacleHeight = 50;
-        Obstacle obstacle = new Obstacle(getWidth(), 500, obstacleWidth, obstacleHeight);
+        Obstacle obstacle = new Obstacle(getWidth() + 1300, 500, obstacleWidth, obstacleHeight);
         obstaclesLevel1.add(obstacle);
     }
 
     public void generateObstacleLevel2() {
-        int obstacleWidth = 60 + random.nextInt(20);
+        int obstacleWidth = 70 + random.nextInt(20);
         int obstacleHeight = 50;
-        Obstacle obstacle = new Obstacle(getWidth(), 450, obstacleWidth, obstacleHeight);
+        Obstacle obstacle = new Obstacle(getWidth() + 1300, 450, obstacleWidth, obstacleHeight);
         obstaclesLevel2.add(obstacle);
     }
 
@@ -104,12 +110,12 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if (isJumping) {
-            characterSpeedY = -5; // Move character upwards during jump
-            jumpHeight -= 5;
+            characterSpeedY = -15; // Move character upwards during jump
+            jumpHeight -= 15;
             if (jumpHeight <= 0) {
                 isJumping = false;
             }
-        } else {
+        } else{
             characterSpeedY = 5; // Apply gravity when not jumping
         }
 
@@ -118,10 +124,18 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         if (characterY > 500) {
             characterY = 500;
             characterSpeedY = 0;
-            canJump = true; // Enable jumping when the player lands
+            canJump = true;
+            jumpCount = 0; // Reset jump count when character lands
         }
-
         characterRect.setBounds(characterX, characterY, 50, 50);
+
+        // Check if the character is on a platform
+        if (characterY == 500 && !isJumping) {
+            onPlatform = true;
+            canDoubleJump = true; // Reset the ability to double jump when on a platform
+        } else {
+            onPlatform = false;
+        }
 
         Iterator<Obstacle> iteratorLevel1 = obstaclesLevel1.iterator();
         Iterator<Coins> coinIteratorLevel1 = coinsLevel1.iterator();
@@ -186,14 +200,17 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
             }
         }
 
+        // Check for coin collection
+        checkCoinCollection();
+
         // Generate new obstacles for Level 1
-        if (System.currentTimeMillis() - lastObstacleTimeLevel1 >= 850) {
+        if (System.currentTimeMillis() - lastObstacleTimeLevel1 >= 1000) {
             generateObstacleLevel1();
 
             lastObstacleTimeLevel1 = System.currentTimeMillis();
         }
         // Generate new obstacles for Level 2
-        if (System.currentTimeMillis() - lastObstacleTimeLevel2 >= 1300) {
+        if (System.currentTimeMillis() - lastObstacleTimeLevel2 >= 1200) {
             generateObstacleLevel2();
 
             lastObstacleTimeLevel2 = System.currentTimeMillis();
@@ -211,7 +228,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         g.setColor(Color.RED); // Set the color to red for Level 1 obstacles
         for (Obstacle obstacle : obstaclesLevel1) {
             //g.fillRect(obstacle.getX(), obstacle.getY(), obstacle.getWidth(), obstacle.getHeight());
-            g.drawImage(platformImage, obstacle.getX(), obstacle.getY(), this);
+            g.drawImage(largePlatformImage, obstacle.getX(), obstacle.getY(), this);
         }
 
         for (Coins coins : coinsLevel1) {
@@ -232,17 +249,64 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
 
         Graphics2D g2d = (Graphics2D) g;
         g2d.drawImage(walkImg, characterX, characterY, this);
+
+          // Draw coin counter
+          g.setColor(Color.WHITE);
+          g.setFont(new Font("Arial", Font.PLAIN, 20));
+          g.drawString("Coins: " + collectedCoins, getWidth() - 100, 30);
+  
     }
 
     @Override
     public void keyPressed(KeyEvent e) {
         int key = e.getKeyCode();
-        if (key == KeyEvent.VK_SPACE && !isJumping && (characterY >= 500 || canJump)) {
+    if (key == KeyEvent.VK_SPACE) {
+        if (onPlatform || canJump || (canDoubleJump && jumpCount < MAX_JUMP_COUNT)) {
             // Start the jump when SPACE key is pressed, and not already jumping,
-            // and character is on the ground or can jump
+            // and character is on the ground or can jump or has available jumps
             isJumping = true;
-            jumpHeight = 80;
+            jumpHeight = (jumpCount == 0) ? 110 : 80; // Different jump heights for initial and double jumps
             canJump = false; // Disable jumping until the player lands
+            jumpCount++; // Increment the jump count
+            if (onPlatform) {
+                canDoubleJump = true; // Allow a double jump when on a platform
+            }
+        }
+    }
+    }
+
+    private void generateCoins() {
+        // Generate coins on platforms
+        // For simplicity, we'll add a few coins to each platform in this example
+        for (Obstacle obstacle : obstaclesLevel1) {
+            int numCoins = random.nextInt(3) + 1; // Generate 1 to 3 coins per platform
+            for (int i = 0; i < numCoins; i++) {
+                int coinX = obstacle.getX() + random.nextInt(obstacle.getWidth() - 30); // Adjust as needed
+                int coinY = obstacle.getY() - 30; // Place the coin above the platform
+                Coin coin = new Coin(coinX, coinY);
+                coins.add(coin);
+            }
+        }
+        for (Obstacle obstacle : obstaclesLevel2) {
+            int numCoins = random.nextInt(3) + 1; // Generate 1 to 3 coins per platform
+            for (int i = 0; i < numCoins; i++) {
+                int coinX = obstacle.getX() + random.nextInt(obstacle.getWidth() - 30); // Adjust as needed
+                int coinY = obstacle.getY() - 30; // Place the coin above the platform
+                Coin coin = new Coin(coinX, coinY);
+                coins.add(coin);
+            }
+        }
+    }
+    private void checkCoinCollection() {
+        Rectangle characterRect = new Rectangle(characterX, characterY, 50, 50);
+        Iterator<Coin> iterator = coins.iterator();
+        while (iterator.hasNext()) {
+            Coin coin = iterator.next();
+            Rectangle coinRect = new Rectangle(coin.getX(), coin.getY(), 30, 30);
+            if (characterRect.intersects(coinRect) && coin.isVisible()) {
+                coin.setVisible(false); // Mark the coin as collected
+                collectedCoins++; // Increment the coin counter
+            }
         }
     }
 
