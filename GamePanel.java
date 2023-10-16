@@ -12,6 +12,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
 
     protected Image walkImg = new ImageIcon("output-onlinegiftools.gif").getImage(); // Walking right
     protected Image platformImage = new ImageIcon("platformvar1.png").getImage(); // Platform image
+    protected Image coinImage = new ImageIcon("coin.gif").getImage(); // Coin image
 
     private int characterX = 100; // Initial character X position
     private int characterY = 500; // Initial character Y position
@@ -26,7 +27,10 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
     private Image backgroundImage;
     private List<Obstacle> obstaclesLevel1 = new ArrayList<>();
     private List<Obstacle> obstaclesLevel2 = new ArrayList<>();
+    private List<Coins> coinsLevel1 = new ArrayList<>();
+    private List<Coins> coinsLevel2 = new ArrayList<>();
     private Random random = new Random();
+    private Timer coinTimer;
 
     public GamePanel() {
         SwingUtilities.invokeLater(() -> {
@@ -45,6 +49,14 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
                 actionPerformed(null); // Call your game loop logic
             }
         }, 0, 20); // Adjust the delay as needed
+
+        coinTimer = new Timer();
+        coinTimer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                generateCoin(); // Call the method to generate coins
+            }
+        }, 0, 10000); // Generate a coin every 10 seconds (10000 milliseconds)
 
         // Initialize character rectangle for collision detection
         characterRect = new Rectangle(characterX, characterY, 50, 50);
@@ -74,6 +86,21 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         obstaclesLevel2.add(obstacle);
     }
 
+    public void generateCoin() {
+        int coinsWidth = 35;
+        int coinsHeight = 35;
+        int coinX = getWidth();
+        int coinY = 500;
+        Coins coin = new Coins(coinX, coinY, coinsWidth, coinsHeight);
+
+        // Decide whether to add the coin to Level 1 or Level 2
+        if (coinX % 2 == 0) { // Example: Add coin to Level 1 on even cycles
+            coinsLevel1.add(coin);
+        } else {
+            coinsLevel2.add(coin);
+        }
+    }
+
     @Override
     public void actionPerformed(ActionEvent e) {
         if (isJumping) {
@@ -97,6 +124,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         characterRect.setBounds(characterX, characterY, 50, 50);
 
         Iterator<Obstacle> iteratorLevel1 = obstaclesLevel1.iterator();
+        Iterator<Coins> coinIteratorLevel1 = coinsLevel1.iterator();
         while (iteratorLevel1.hasNext()) {
             Obstacle obstacle = iteratorLevel1.next();
             if (characterY + 50 > obstacle.getY() && characterY < obstacle.getY() + obstacle.getHeight()
@@ -112,8 +140,13 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
                     canJump = true; // Enable jumping when on the obstacle
                 }
             }
-
             obstacle.moveLeft();
+
+            // Move the coins with the obstacles
+            if (coinIteratorLevel1.hasNext()) {
+                Coins coin = coinIteratorLevel1.next();
+                coin.moveLeft();
+            }
 
             if (obstacle.getX() + obstacle.getWidth() <= 0) {
                 // Remove obstacles that are out of the screen
@@ -122,6 +155,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         }
 
         Iterator<Obstacle> iteratorLevel2 = obstaclesLevel2.iterator();
+        Iterator<Coins> coinIteratorLevel2 = coinsLevel2.iterator();
         while (iteratorLevel2.hasNext()) {
             Obstacle obstacle = iteratorLevel2.next();
             if (characterY + 50 > obstacle.getY() && characterY < obstacle.getY() + obstacle.getHeight()
@@ -140,6 +174,12 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
 
             obstacle.moveLeft();
 
+            // Move the coins with the obstacles
+            if (coinIteratorLevel2.hasNext()) {
+                Coins coin = coinIteratorLevel2.next();
+                coin.moveLeft();
+            }
+
             if (obstacle.getX() + obstacle.getWidth() <= 0) {
                 // Remove obstacles that are out of the screen
                 iteratorLevel2.remove();
@@ -149,11 +189,13 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         // Generate new obstacles for Level 1
         if (System.currentTimeMillis() - lastObstacleTimeLevel1 >= 850) {
             generateObstacleLevel1();
+
             lastObstacleTimeLevel1 = System.currentTimeMillis();
         }
         // Generate new obstacles for Level 2
         if (System.currentTimeMillis() - lastObstacleTimeLevel2 >= 1300) {
             generateObstacleLevel2();
+
             lastObstacleTimeLevel2 = System.currentTimeMillis();
         }
 
@@ -172,10 +214,18 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
             g.drawImage(platformImage, obstacle.getX(), obstacle.getY(), this);
         }
 
+        for (Coins coins : coinsLevel1) {
+            g.drawImage(coinImage, coins.getX(), coins.getY(), this);
+        }
+
         g.setColor(Color.GREEN); // Set the color to green for Level 2 obstacles
         for (Obstacle obstacle : obstaclesLevel2) {
             //g.fillRect(obstacle.getX(), obstacle.getY(), obstacle.getWidth(), obstacle.getHeight());
             g.drawImage(platformImage, obstacle.getX(), obstacle.getY(), this);
+        }
+
+        for (Coins coins : coinsLevel2) {
+            g.drawImage(coinImage, coins.getX(), coins.getY(), this);
         }
 
         Toolkit.getDefaultToolkit().sync();
