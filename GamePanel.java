@@ -75,7 +75,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
     }
 
     public void generateObstacleLevel1() {
-        int obstacleWidth =random.nextInt(20) + 90;
+        int obstacleWidth = 120 + random.nextInt(20);
         int obstacleHeight = 50;
         Obstacle obstacle = new Obstacle(getWidth() + 1300, 500, obstacleWidth, obstacleHeight);
         obstaclesLevel1.add(obstacle);
@@ -246,8 +246,8 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         for (Obstacle obstacle : obstaclesLevel1) {
             int numCoins = random.nextInt(3) + 1; // Generate 1 to 3 coins per platform
             for (int i = 0; i < numCoins; i++) {
-                int coinX = obstacle.getX() + random.nextInt(obstacle.getWidth() - 30); // Adjust as needed
-                int coinY = obstacle.getY() - 30; // Place the coin above the platform
+                int coinX = obstacle.getX() + random.nextInt(obstacle.getWidth() - 35); // Adjust as needed
+                int coinY = obstacle.getY() - 35; // Place the coin above the platform
                 Coin coin = new Coin(coinX, coinY);
                 coins.add(coin);
             }
@@ -255,8 +255,8 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         for (Obstacle obstacle : obstaclesLevel2) {
             int numCoins = random.nextInt(3) + 1; // Generate 1 to 3 coins per platform
             for (int i = 0; i < numCoins; i++) {
-                int coinX = obstacle.getX() + random.nextInt(obstacle.getWidth() - 30); // Adjust as needed
-                int coinY = obstacle.getY() - 30; // Place the coin above the platform
+                int coinX = obstacle.getX() + random.nextInt(obstacle.getWidth() - 35); // Adjust as needed
+                int coinY = obstacle.getY() - 35; // Place the coin above the platform
                 Coin coin = new Coin(coinX, coinY);
                 coins.add(coin);
             }
