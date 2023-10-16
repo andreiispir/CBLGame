@@ -86,6 +86,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
             int coinY = obstacle.getY() - 30; // Place the coin above the platform
             Coin coin = new Coin(coinX, coinY);
             coins.add(coin);
+            //coin.moveLeft();
         }
         
     }
@@ -102,6 +103,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
             int coinY = obstacle.getY() - 30; // Place the coin above the platform
             Coin coin = new Coin(coinX, coinY);
             coins.add(coin);
+            //coin.moveLeft();
         }
     }
 
@@ -136,8 +138,10 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         }
 
         Iterator<Obstacle> iteratorLevel1 = obstaclesLevel1.iterator();
+        Iterator<Coin> iteratorCoin = coins.iterator();
         while (iteratorLevel1.hasNext()) {
             Obstacle obstacle = iteratorLevel1.next();
+            Coin coin = iteratorCoin.next();
             if (characterY + 50 > obstacle.getY() && characterY < obstacle.getY() + obstacle.getHeight()
                     && characterX + 50 > obstacle.getX() && characterX < obstacle.getX() + obstacle.getWidth()) {
                 // Character is colliding with the obstacle
@@ -153,11 +157,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
             }
 
             obstacle.moveLeft();
-
-            for (Coin coin : coins) {
-                coin.moveLeft();
-            }
-
+            coin.moveLeft();
 
             if (obstacle.getX() + obstacle.getWidth() <= 0) {
                 // Remove obstacles that are out of the screen
@@ -168,6 +168,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         Iterator<Obstacle> iteratorLevel2 = obstaclesLevel2.iterator();
         while (iteratorLevel2.hasNext()) {
             Obstacle obstacle = iteratorLevel2.next();
+            Coin coin = iteratorCoin.next();
             if (characterY + 50 > obstacle.getY() && characterY < obstacle.getY() + obstacle.getHeight()
                     && characterX + 50 > obstacle.getX() && characterX < obstacle.getX() + obstacle.getWidth()) {
                 // Character is colliding with the obstacle
@@ -183,10 +184,8 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
             }
 
             obstacle.moveLeft();
+            coin.moveLeft();
 
-            for (Coin coin : coins) {
-                coin.moveLeft();
-            }
 
             if (obstacle.getX() + obstacle.getWidth() <= 0) {
                 // Remove obstacles that are out of the screen

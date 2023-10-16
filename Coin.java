@@ -11,6 +11,10 @@ public class Coin {
         this.speed = 5;
     }
 
+    public int getSpeed() {
+        return speed;
+    }
+
     public int getX() {
         return x;
     }
