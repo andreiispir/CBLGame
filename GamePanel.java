@@ -10,29 +10,33 @@ import java.util.Timer;
 
 public class GamePanel extends JPanel implements ActionListener, KeyListener {
 
-    protected Image walkImg = new ImageIcon("Images\\output-onlinegiftools.gif").getImage(); // Walking right
+    protected Image walkImg = new ImageIcon("Images\\knightWalk.gif").getImage(); // Walking right
     protected Image platformImage = new ImageIcon("Images\\platformvar1.png").getImage(); // Platform image
     protected Image largePlatformImage = new ImageIcon("Images\\platformvar2.png").getImage(); // Larger platform image
     protected Image coinImg = new ImageIcon("Images\\coinAnim2.gif").getImage(); // Load coin animation
+    protected Image trapImg = new ImageIcon("Images\\spikeTrap.gif").getImage(); // Load spike animation
 
     private int characterX = 100; // Initial character X position
-    private int characterY = 500; // Initial character Y position
+    private int characterY = 525; // Initial character Y position
     private int characterSpeedY = 0; // Character's vertical speed
     private int jumpHeight = 0; // Initialize jump height to 0
     private boolean isJumping = false;
     private boolean canJump = true; // Add a boolean flag to track if the player can jump
     private Timer timer;
-    private long lastObstacleTimeLevel1;
-    private long lastObstacleTimeLevel2;
+    private long lastPlatformTimeLevel1;
+    private long lastPlatformTimeLevel2;
+    private long lastTrapTime;
     private Rectangle characterRect;
     private Image backgroundImage;
-    private List<Obstacle> obstaclesLevel1 = new ArrayList<>();
-    private List<Obstacle> obstaclesLevel2 = new ArrayList<>();
+    private List<Platform> platformsLevel1 = new ArrayList<>();
+    private List<Platform> platformsLevel2 = new ArrayList<>();
     private Random random = new Random();
     private int jumpCount = 0; // Track the number of jumps
     private static final int MAX_JUMP_COUNT = 2; // Maximum allowed jumps (including the initial jump)
     private List<Coin> coins = new ArrayList<>();
+    private List<Trap> traps = new ArrayList<>();
     private int collectedCoins = 0; // Counter for collected coins
+    private int lifeBar = 100; // Initialize life bar to 100
     private boolean onPlatform = false; // Flag to track if the character is on a platform
     private boolean canDoubleJump = false; // Flag to track if the character can perform a double jump
 
@@ -71,16 +75,16 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         requestFocus();
     }
 
-    public void generateObstacleLevel1() {
-        int obstacleWidth = 120 + random.nextInt(20);
-        int obstacleHeight = 50;
-        Obstacle obstacle = new Obstacle(getWidth()+1000, 500, obstacleWidth, obstacleHeight);
-        obstaclesLevel1.add(obstacle);
+    public void generatePlatformLevel1() {
+        int platformWidth = 120 + random.nextInt(20);
+        int platformHeight = 50;
+        Platform platform = new Platform(getWidth()+1000, 520, platformWidth, platformHeight);
+        platformsLevel1.add(platform);
 
         int numCoins = random.nextInt(3) + 1; // Generate 1 to 3 coins per platform
         for (int i = 0; i < numCoins; i++) {
-            int coinX = obstacle.getX() + random.nextInt(obstacle.getWidth() - 30); // Adjust as needed
-            int coinY = obstacle.getY() - 30; // Place the coin above the platform
+            int coinX = platform.getX() + random.nextInt(platform.getWidth() - 30); // Adjust as needed
+            int coinY = platform.getY() - 30; // Place the coin above the platform
             Coin coin = new Coin(coinX, coinY);
             coins.add(coin);
             //coin.moveLeft();
@@ -88,20 +92,29 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         
     }
 
-    public void generateObstacleLevel2() {
-        int obstacleWidth = 70 + random.nextInt(20);
-        int obstacleHeight = 50;
-        Obstacle obstacle = new Obstacle(getWidth()+1000, 450, obstacleWidth, obstacleHeight);
-        obstaclesLevel2.add(obstacle);
+    public void generatePlatformLevel2() {
+        int platformWidth = 70 + random.nextInt(20);
+        int platformHeight = 50;
+        Platform platform = new Platform(getWidth()+1000, 450, platformWidth, platformHeight);
+        platformsLevel2.add(platform);
 
         int numCoins = random.nextInt(3) + 1; // Generate 1 to 3 coins per platform
         for (int i = 0; i < numCoins; i++) {
-            int coinX = obstacle.getX() + random.nextInt(obstacle.getWidth() - 30); // Adjust as needed
-            int coinY = obstacle.getY() - 30; // Place the coin above the platform
+            int coinX = platform.getX() + random.nextInt(platform.getWidth() - 30); // Adjust as needed
+            int coinY = platform.getY() - 30; // Place the coin above the platform
             Coin coin = new Coin(coinX, coinY);
             coins.add(coin);
             //coin.moveLeft();
         }
+    }
+
+    public void generateTrap() {
+        int trapWidth = 30;
+        int trapHeight = 30;
+
+
+        Trap trap = new Trap(getWidth(), 496, trapWidth, trapHeight);
+        traps.add(trap);
     }
 
     @Override
@@ -118,8 +131,8 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
 
         characterY += characterSpeedY;
 
-        if (characterY > 500) {
-            characterY = 500;
+        if (characterY > 525) {
+            characterY = 525;
             characterSpeedY = 0;
             canJump = true;
             jumpCount = 0; // Reset jump count when character lands
@@ -127,65 +140,68 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         characterRect.setBounds(characterX, characterY, 50, 50);
 
         // Check if the character is on a platform
-        if (characterY == 500 && !isJumping) {
+        if (characterY == 525 && !isJumping) {
             onPlatform = true;
             canDoubleJump = true; // Reset the ability to double jump when on a platform
         } else {
             onPlatform = false;
         }
 
-        Iterator<Obstacle> iteratorLevel1 = obstaclesLevel1.iterator();
+        Iterator<Platform> iteratorLevel1 = platformsLevel1.iterator();
         Iterator<Coin> iteratorCoin = coins.iterator();
+        Iterator<Trap> iteratorTrap = traps.iterator();
         while (iteratorLevel1.hasNext()) {
-            Obstacle obstacle = iteratorLevel1.next();
+            Platform platform = iteratorLevel1.next();
             Coin coin = iteratorCoin.next();
-            if (characterY + 50 > obstacle.getY() && characterY < obstacle.getY() + obstacle.getHeight()
-                    && characterX + 50 > obstacle.getX() && characterX < obstacle.getX() + obstacle.getWidth()) {
-                // Character is colliding with the obstacle
-                if (characterY > 460 && characterY <= 500) {
+            Trap trap = iteratorTrap.next();
+            if (characterY + 50 > platform.getY() && characterY < platform.getY() + platform.getHeight()
+                    && characterX + 50 > platform.getX() && characterX < platform.getX() + platform.getWidth()) {
+                // Character is colliding with the platform
+                if (characterY > 485 && characterY <= 525) {
                     new GameOver();
                     timer.cancel();
                 }
-                if (!isJumping && characterY < obstacle.getY()) {
-                    // Character is above the obstacle, reset its vertical position
-                    characterY = obstacle.getY() - 50;
-                    canJump = true; // Enable jumping when on the obstacle
+                if (!isJumping && characterY < platform.getY()) {
+                    // Character is above the platform, reset its vertical position
+                    characterY = platform.getY() - 50;
+                    canJump = true; // Enable jumping when on the platform
                 }
             }
 
-            obstacle.moveLeft();
+            platform.moveLeft();
             coin.moveLeft();
+            trap.moveLeft();
 
-            if (obstacle.getX() + obstacle.getWidth() <= 0) {
-                // Remove obstacles that are out of the screen
+            if (platform.getX() + platform.getWidth() <= 0) {
+                // Remove platforms that are out of the screen
                 iteratorLevel1.remove();
             }
         }
 
-        Iterator<Obstacle> iteratorLevel2 = obstaclesLevel2.iterator();
+        Iterator<Platform> iteratorLevel2 = platformsLevel2.iterator();
         while (iteratorLevel2.hasNext()) {
-            Obstacle obstacle = iteratorLevel2.next();
+            Platform platform = iteratorLevel2.next();
             Coin coin = iteratorCoin.next();
-            if (characterY + 50 > obstacle.getY() && characterY < obstacle.getY() + obstacle.getHeight()
-                    && characterX + 50 > obstacle.getX() && characterX < obstacle.getX() + obstacle.getWidth()) {
-                // Character is colliding with the obstacle
+            if (characterY + 50 > platform.getY() && characterY < platform.getY() + platform.getHeight()
+                    && characterX + 50 > platform.getX() && characterX < platform.getX() + platform.getWidth()) {
+                // Character is colliding with the platform
                 if (characterY > 410 && characterY <= 450) {
                     new GameOver();
                     timer.cancel();
                 }
-                if (!isJumping && characterY < obstacle.getY()) {
-                    // Character is above the obstacle, reset its vertical position
-                    characterY = obstacle.getY() - 50;
-                    canJump = true; // Enable jumping when on the obstacle
+                if (!isJumping && characterY < platform.getY()) {
+                    // Character is above the platform, reset its vertical position
+                    characterY = platform.getY() - 50;
+                    canJump = true; // Enable jumping when on the platform
                 }
             }
 
-            obstacle.moveLeft();
+            platform.moveLeft();
             coin.moveLeft();
 
 
-            if (obstacle.getX() + obstacle.getWidth() <= 0) {
-                // Remove obstacles that are out of the screen
+            if (platform.getX() + platform.getWidth() <= 0) {
+                // Remove platforms that are out of the screen
                 iteratorLevel2.remove();
             }
         }
@@ -193,16 +209,18 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
 
         // Check for coin collection
         checkCoinCollection();
+        checkTrapCollision();
 
-        // Generate new obstacles for Level 1
-        if (System.currentTimeMillis() - lastObstacleTimeLevel1 >= 1000) {
-            generateObstacleLevel1();
-            lastObstacleTimeLevel1 = System.currentTimeMillis();
+        // Generate new platforms for Level 1
+        if (System.currentTimeMillis() - lastPlatformTimeLevel1 >= random.nextInt(1000, 2000)) {
+            generatePlatformLevel1();
+            generateTrap();
+            lastPlatformTimeLevel1 = System.currentTimeMillis();
         }
-        // Generate new obstacles for Level 2
-        if (System.currentTimeMillis() - lastObstacleTimeLevel2 >= 1600) {
-            generateObstacleLevel2();
-            lastObstacleTimeLevel2 = System.currentTimeMillis();
+        // Generate new platforms for Level 2
+        if (System.currentTimeMillis() - lastPlatformTimeLevel2 >= random.nextInt(1500, 2500)) {
+            generatePlatformLevel2();
+            lastPlatformTimeLevel2 = System.currentTimeMillis();
         }
 
         repaint();
@@ -214,16 +232,16 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
 
         g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
 
-        g.setColor(Color.RED); // Set the color to red for Level 1 obstacles
-        for (Obstacle obstacle : obstaclesLevel1) {
-            //g.fillRect(obstacle.getX(), obstacle.getY(), obstacle.getWidth(), obstacle.getHeight());
-            g.drawImage(largePlatformImage, obstacle.getX(), obstacle.getY(), this);
+        g.setColor(Color.RED); // Set the color to red for Level 1 Platforms
+        for (Platform platform : platformsLevel1) {
+            //g.fillRect(platform.getX(), platform.getY(), platform.getWidth(), platform.getHeight());
+            g.drawImage(largePlatformImage, platform.getX(), platform.getY(), this);
         }
 
-        g.setColor(Color.GREEN); // Set the color to green for Level 2 obstacles
-        for (Obstacle obstacle : obstaclesLevel2) {
-            //g.fillRect(obstacle.getX(), obstacle.getY(), obstacle.getWidth(), obstacle.getHeight());
-            g.drawImage(platformImage, obstacle.getX(), obstacle.getY(), this);
+        g.setColor(Color.GREEN); // Set the color to green for Level 2 platforms
+        for (Platform platform : platformsLevel2) {
+            //g.fillRect(platform.getX(), platform.getY(), platform.getWidth(), platform.getHeight());
+            g.drawImage(platformImage, platform.getX(), platform.getY(), this);
         }
 
         // Draw coins
@@ -233,16 +251,23 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
             }
         }
 
+        for (Trap trap : traps)
+        {
+            g.drawImage(trapImg, trap.getX(), trap.getY(), this);
+        }
+
         Toolkit.getDefaultToolkit().sync();
 
         Graphics2D g2d = (Graphics2D) g;
         g2d.drawImage(walkImg, characterX, characterY, this);
 
-          // Draw coin counter
-          g.setColor(Color.WHITE);
-          g.setFont(new Font("Arial", Font.PLAIN, 20));
-          g.drawString("Coins: " + collectedCoins, getWidth() - 100, 30);
-  
+        // Draw coin counter
+        g.setColor(Color.YELLOW);
+        g.setFont(new Font("Tahoma", Font. BOLD, 17));
+        g.drawString("Coins: " + collectedCoins, getWidth() - 100, 30);
+        g.setColor(Color.RED);
+        g.drawString("Life: " + lifeBar, getWidth() - 100, 60);
+
     }
 
     @Override
@@ -272,6 +297,24 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
             if (characterRect.intersects(coinRect) && coin.isVisible()) {
                 coin.setVisible(false); // Mark the coin as collected
                 collectedCoins++; // Increment the coin counter
+            }
+        }
+    }
+
+    private void checkTrapCollision() {
+        Rectangle characterRect = new Rectangle(characterX, characterY, 50, 50);
+        Iterator<Trap> iterator = traps.iterator();
+        while (iterator.hasNext()) {
+            Trap trap = iterator.next();
+            Rectangle trapRect = new Rectangle(trap.getX(), trap.getY(), 30, 30);
+            if (characterRect.intersects(trapRect)) {
+                lifeBar -= 10; // Decrease the life bar by 10
+                if (lifeBar == 0) {
+                    new GameOver();
+                    timer.cancel();
+                }
+                //lastTrapTime = System.currentTimeMillis();
+                continue;
             }
         }
     }
