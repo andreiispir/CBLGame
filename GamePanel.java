@@ -10,10 +10,10 @@ import java.util.Timer;
 
 public class GamePanel extends JPanel implements ActionListener, KeyListener {
 
-    protected Image walkImg = new ImageIcon("output-onlinegiftools.gif").getImage(); // Walking right
-    protected Image platformImage = new ImageIcon("platformvar1.png").getImage(); // Platform image
-    protected Image largePlatformImage = new ImageIcon("platformvar2.png").getImage(); // Larger platform image
-    protected Image coinImg = new ImageIcon("coinAnim2.gif").getImage(); // Load coin animation
+    protected Image walkImg = new ImageIcon("Images\\output-onlinegiftools.gif").getImage(); // Walking right
+    protected Image platformImage = new ImageIcon("Images\\platformvar1.png").getImage(); // Platform image
+    protected Image largePlatformImage = new ImageIcon("Images\\platformvar2.png").getImage(); // Larger platform image
+    protected Image coinImg = new ImageIcon("Images\\coinAnim2.gif").getImage(); // Load coin animation
 
     private int characterX = 100; // Initial character X position
     private int characterY = 500; // Initial character Y position
@@ -58,7 +58,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         characterRect = new Rectangle(characterX, characterY, 50, 50);
 
         // Load background image
-        backgroundImage = new ImageIcon("background2.png").getImage(); // Change to your background image path
+        backgroundImage = new ImageIcon("Images\\background2.png").getImage(); // Change to your background image path
 
         // Add the KeyListener to the game panel
         addKeyListener(this);
