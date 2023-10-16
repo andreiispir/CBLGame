@@ -12,7 +12,6 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
 
     protected Image walkImg = new ImageIcon("output-onlinegiftools.gif").getImage(); // Walking right
     protected Image platformImage = new ImageIcon("platformvar1.png").getImage(); // Platform image
-    protected Image coinImage = new ImageIcon("coin.gif").getImage(); // Coin image
     protected Image largePlatformImage = new ImageIcon("platformvar2.png").getImage(); // Larger platform image
     protected Image coinImg = new ImageIcon("coinAnim2.gif").getImage(); // Load coin animation
 
@@ -30,7 +29,6 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
     private List<Obstacle> obstaclesLevel1 = new ArrayList<>();
     private List<Obstacle> obstaclesLevel2 = new ArrayList<>();
     private Random random = new Random();
-    private Timer coinTimer;
     private int jumpCount = 0; // Track the number of jumps
     private static final int MAX_JUMP_COUNT = 2; // Maximum allowed jumps (including the initial jump)
     private List<Coin> coins = new ArrayList<>();
@@ -139,6 +137,9 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
 
             obstacle.moveLeft();
 
+            moveCoins();
+
+
             if (obstacle.getX() + obstacle.getWidth() <= 0) {
                 // Remove obstacles that are out of the screen
                 iteratorLevel1.remove();
@@ -164,11 +165,14 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
 
             obstacle.moveLeft();
 
+            moveCoins();
+
             if (obstacle.getX() + obstacle.getWidth() <= 0) {
                 // Remove obstacles that are out of the screen
                 iteratorLevel2.remove();
             }
         }
+        
 
         // Check for coin collection
         checkCoinCollection();
@@ -185,6 +189,12 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         }
 
         repaint();
+    }
+
+    public void moveCoins() {
+        for (Coin coin : coins) {
+            coin.moveLeft();
+        }
     }
 
     @Override
@@ -205,8 +215,6 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
             g.drawImage(platformImage, obstacle.getX(), obstacle.getY(), this);
         }
 
-        for (Coins coins : coinsLevel2) {
-            g.drawImage(coinImage, coins.getX(), coins.getY(), this);
         // Draw coins
         for (Coin coin : coins) {
             if (coin.isVisible()) {
@@ -254,7 +262,9 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
                 int coinY = obstacle.getY() - 30; // Place the coin above the platform
                 Coin coin = new Coin(coinX, coinY);
                 coins.add(coin);
+                coin.moveLeft();
             }
+            
         }
         for (Obstacle obstacle : obstaclesLevel2) {
             int numCoins = random.nextInt(3) + 1; // Generate 1 to 3 coins per platform
@@ -289,7 +299,4 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         // Unused for this example
     }
 
-    public static void main(String[] args) {
-        new GamePanel();
-    }
 }
