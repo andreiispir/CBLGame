@@ -15,6 +15,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
     protected Image largePlatformImage = new ImageIcon("Images\\platformvar2.png").getImage(); // Larger platform image
     protected Image coinImg = new ImageIcon("Images\\coinAnim2.gif").getImage(); // Load coin animation
     protected Image trapImg = new ImageIcon("Images\\spikeTrap.gif").getImage(); // Load spike animation
+    protected Image injuredImage = new ImageIcon("Images\\injuredKnight.gif").getImage(); // Load injured animation
 
     private int characterX = 100; // Initial character X position
     private int characterY = 525; // Initial character Y position
@@ -23,9 +24,9 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
     private boolean isJumping = false;
     private boolean canJump = true; // Add a boolean flag to track if the player can jump
     private Timer timer;
-    private long lastPlatformTimeLevel1;
-    private long lastPlatformTimeLevel2;
-    private long lastTrap;
+    private long lastPlatformTimeLevel1 = System.currentTimeMillis();
+    private long lastPlatformTimeLevel2 = System.currentTimeMillis();
+    private long lastTrap = System.currentTimeMillis();
     private Rectangle characterRect;
     private Image backgroundImage;
     private List<Platform> platformsLevel1 = new ArrayList<>();
@@ -38,6 +39,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
     private int collectedCoins = 0; // Counter for collected coins
     private int lifeBar = 100; // Initialize life bar to 100
     private boolean collisionCheck = false; // Flag to track if the character has collided with a trap
+    private boolean isInjured = false; // Flag to track if the character is injured
     private boolean onPlatform = false; // Flag to track if the character is on a platform
     private boolean canDoubleJump = false; // Flag to track if the character can perform a double jump
     
@@ -52,13 +54,16 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
             frame.setVisible(true);
         });
 
+        //lastTrap = System.currentTimeMillis();
+
+        System.out.println(System.currentTimeMillis() + " " + lastTrap);
         timer = new Timer();
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
                 actionPerformed(null); // Call your game loop logic
             }
-        }, 0, 20); // Adjust the delay as needed
+        },0, 20); // Adjust the delay as needed
 
         // Initialize character rectangle for collision detection
         characterRect = new Rectangle(characterX, characterY, 50, 50);
@@ -66,9 +71,10 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         // Load background image
         backgroundImage = new ImageIcon("Images\\background2.png").getImage(); // Change to your background image path
 
+            System.out.println(traps.size());
         // Add the KeyListener to the game panel
         addKeyListener(this);
-
+        
         // Load coin image
         coinImg = coinImg.getScaledInstance(35, 35, Image.SCALE_DEFAULT);
 
@@ -80,7 +86,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
     public void generateLevel1() {
         int platformWidth = 120 + random.nextInt(20);
         int platformHeight = 50;
-        Platform platform = new Platform(getWidth()+1000, 520, platformWidth, platformHeight);
+        Platform platform = new Platform(getWidth() + 1300, 520, platformWidth, platformHeight);
         platformsLevel1.add(platform);
 
         int numCoins = random.nextInt(3) + 1; // Generate 1 to 3 coins per platform
@@ -97,7 +103,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
     public void generateLevel2() {
         int platformWidth = 70 + random.nextInt(20);
         int platformHeight = 50;
-        Platform platform = new Platform(getWidth()+1000, 450, platformWidth, platformHeight);
+        Platform platform = new Platform(getWidth() + 1300, 450, platformWidth, platformHeight);
         platformsLevel2.add(platform);
         
         int numCoins = random.nextInt(3) + 1; // Generate 1 to 3 coins per platform
@@ -116,7 +122,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
 
         String[] trapY = {"496", "546"};
         int randomTrapY = random.nextInt(trapY.length);
-        Trap trap = new Trap(getWidth(), /*random.nextInt(randomTrapY)*/ 496, trapWidth, trapHeight);
+        Trap trap = new Trap(getWidth() + 2000,/* random.nextInt(randomTrapY)*/ 496, trapWidth, trapHeight);
         traps.add(trap);
     }
 
@@ -227,14 +233,9 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
             generateLevel2();
             lastPlatformTimeLevel2 = System.currentTimeMillis();
         }
-
-        // if (System.currentTimeMillis() - lastTrap >= 3000) {
-        //     generateTrap();
-        //     lastTrap = System.currentTimeMillis();
-        // }
-
+        
         generateTrap();
-
+                                  
         repaint();
     }
 
@@ -263,14 +264,21 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
             }
         }
 
+
         for (Trap trap : traps) {
             g.drawImage(trapImg, trap.getX(), trap.getY(), this);
         }
 
         Toolkit.getDefaultToolkit().sync();
 
-        Graphics2D g2d = (Graphics2D) g;
-        g2d.drawImage(walkImg, characterX, characterY, this);
+        //Graphics2D g2d = (Graphics2D) g;
+        
+        if (isInjured) {
+            g.drawImage(injuredImage, characterX, characterY, this);
+        } else {
+            g.drawImage(walkImg, characterX, characterY, this);
+        }
+        //g2d.drawImage(walkImg, characterX, characterY, this);
 
         // Draw coin counter
         g.setColor(Color.YELLOW);
@@ -318,13 +326,23 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         while (iterator.hasNext()) {
             Trap trap = iterator.next();
             Rectangle trapRect = new Rectangle(trap.getX(), trap.getY(), 30, 30);
-            if (characterRect.intersects(trapRect) && !collisionCheck ) {
+            if (characterRect.intersects(trapRect) && !isInjured ) {
                 lifeBar -= 10; // Decrease the life bar by 10
-                collisionCheck = true;
                 if (lifeBar == 0) {
                     new GameOver();
                     timer.cancel();
                 }
+                
+                isInjured = true;
+                Timer injuredTime = new Timer();
+
+                injuredTime.schedule(new TimerTask() {
+                    public void run() {
+                        isInjured = false;
+                        repaint();
+                        injuredTime.cancel();
+                    }
+                }, 1000);
                 //lastTrapTime = System.currentTimeMillis();
             }
         }
