@@ -13,7 +13,7 @@ import javax.swing.JSlider;
 
 public class StartMenu extends JPanel {
     
-    protected Image menuBackground = new ImageIcon("Images\\menu.jpg").getImage();
+    protected Image menuBackground = new ImageIcon("src\\menu.jpg").getImage();
     JSlider slider;
     MusicPlayer music = new MusicPlayer();
 
@@ -52,7 +52,7 @@ public class StartMenu extends JPanel {
             }
         });
 
-        URL musicURL = getClass().getResource("reginanoptii.wav");
+        URL musicURL = getClass().getResource("src\\reginanoptii.wav");
         playMusic(musicURL);
 
         JButton op = new JButton("Options");
@@ -72,10 +72,7 @@ public class StartMenu extends JPanel {
             }
             
         });
-        //new MusicPlayer().playMusic(filePath);
-
-        
-        
+                
     }
     
     public void playMusic(URL url) {

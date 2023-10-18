@@ -1,6 +1,12 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -10,12 +16,12 @@ import java.util.Timer;
 
 public class GamePanel extends JPanel implements ActionListener, KeyListener {
 
-    protected Image walkImg = new ImageIcon("Images\\knightWalk.gif").getImage(); // Walking right
-    protected Image platformImage = new ImageIcon("Images\\platformvar1.png").getImage(); // Platform image
-    protected Image largePlatformImage = new ImageIcon("Images\\platformvar2.png").getImage(); // Larger platform image
-    protected Image coinImg = new ImageIcon("Images\\coinAnim2.gif").getImage(); // Load coin animation
-    protected Image trapImg = new ImageIcon("Images\\spikeTrap.gif").getImage(); // Load spike animation
-    protected Image injuredImage = new ImageIcon("Images\\injuredKnight.gif").getImage(); // Load injured animation
+    protected Image walkImg = new ImageIcon("src\\knightWalk.gif").getImage(); // Walking right
+    protected Image platformImage = new ImageIcon("src\\platformvar1.png").getImage(); // Platform image
+    protected Image largePlatformImage = new ImageIcon("src\\platformvar2.png").getImage(); // Larger platform image
+    protected Image coinImg = new ImageIcon("src\\coinAnim2.gif").getImage(); // Load coin animation
+    protected Image trapImg = new ImageIcon("src\\spikeTrap.gif").getImage(); // Load spike animation
+    protected Image injuredImage = new ImageIcon("src\\injuredKnight.gif").getImage(); // Load injured animation
 
     private int characterX = 100; // Initial character X position
     private int characterY = 525; // Initial character Y position
@@ -37,6 +43,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
     private List<Coin> coins = new ArrayList<>();
     private List<Trap> traps = new ArrayList<>();
     private int collectedCoins = 0; // Counter for collected coins
+    private String highScore = "nobody:0"; // The high score
     private int lifeBar = 100; // Initialize life bar to 100
     private boolean collisionCheck = false; // Flag to track if the character has collided with a trap
     private boolean isInjured = false; // Flag to track if the character is injured
@@ -51,9 +58,8 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
             frame.setSize(1366, 768);
             frame.setLocationRelativeTo(null);
             frame.add(this);
-            frame.setVisible(true);
+            frame.setVisible(true); 
         });
-
 
         //lastTrap = System.currentTimeMillis();
 
@@ -70,12 +76,12 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         characterRect = new Rectangle(characterX, characterY, 50, 50);
 
         // Load background image
-        backgroundImage = new ImageIcon("Images\\background2.png").getImage(); // Change to your background image path
+        backgroundImage = new ImageIcon("src\\background2.png").getImage(); // Change to your background image path
 
             System.out.println(traps.size());
         // Add the KeyListener to the game panel
         addKeyListener(this);
-        
+
         // Load coin image
         coinImg = coinImg.getScaledInstance(35, 35, Image.SCALE_DEFAULT);
 
@@ -169,7 +175,8 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
                 // Character is colliding with the platform
                 //platformsCount++;
                 if (characterY > 485 && characterY <= 525) {
-                    new GameOverMenu(collectedCoins);
+                    checkScore();
+                    new GameOverMenu(collectedCoins, highScore);
                     timer.cancel();
                 }
                 if (!isJumping && characterY < platform.getY()) {
@@ -198,7 +205,8 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
                 // Character is colliding with the platform
                 //platformsCount++;
                 if (characterY > 410 && characterY <= 450) {
-                    new GameOverMenu(collectedCoins);
+                    checkScore();
+                    new GameOverMenu(collectedCoins, highScore);
                     timer.cancel();
                 }
                 if (!isJumping && characterY < platform.getY()) {
@@ -284,13 +292,15 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
             g.drawImage(walkImg, characterX, characterY, this);
         }
         //g2d.drawImage(walkImg, characterX, characterY, this);
-
+        initScore();
         // Draw coin counter
         g.setColor(Color.YELLOW);
         g.setFont(new Font("Tahoma", Font.BOLD, 17));
         g.drawString("Coins: " + collectedCoins, getWidth() - 100, 30);
         g.setColor(Color.RED);
         g.drawString("Life: " + lifeBar, getWidth() - 100, 60);
+        //g.drawString("HighScore: " + highScore, 0, 60);
+
 
     }
 
@@ -323,7 +333,9 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
                 collectedCoins++; // Increment the coin counter
             }
         }
+
     }
+    
 
     private void checkTrapCollision() {
         Rectangle characterRect = new Rectangle(characterX, characterY, 50, 50);
@@ -334,7 +346,8 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
             if (characterRect.intersects(trapRect) && !isInjured ) {
                 lifeBar -= 10; // Decrease the life bar by 10
                 if (lifeBar == 0) {
-                    new GameOverMenu(collectedCoins);
+                    checkScore();
+                    new GameOverMenu(collectedCoins, highScore);
                     timer.cancel();
                 }
                 
@@ -353,6 +366,78 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         }
     }
 
+
+    public String getHighScore() {
+        
+        FileReader readFile = null;
+        BufferedReader reader = null;
+
+        try {
+            readFile = new FileReader("highscore.dat");
+            reader = new BufferedReader(readFile);
+            return reader.readLine();
+        } catch (Exception e) {
+            return "0";
+        } finally {
+            try {
+                if (reader != null) {
+                    reader.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        
+    }
+
+    public void checkScore() {
+
+        System.out.println(highScore);
+        if (highScore.equals("")) {
+            return;
+        }
+
+        if (collectedCoins > Integer.parseInt((highScore.split(":")[1]))) {
+            String name = JOptionPane.showInputDialog("You set a new high score! What is your name?");
+            highScore = name + ":" + collectedCoins;
+
+            File scoreFile = new File("highscore.dat");
+            if(!scoreFile.exists()) {
+                try {
+                    scoreFile.createNewFile();
+                } catch (IOException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            }
+
+            FileWriter writeFile = null;
+            BufferedWriter writer = null;
+            
+            try {
+                writeFile = new FileWriter(scoreFile);
+                writer = new BufferedWriter(writeFile);
+                writer.write(this.highScore);
+
+            } catch (Exception e) {
+
+            } finally {
+                try {
+                    if (writer != null) {
+                        writer.close();
+                    }
+                } catch (Exception e) {
+                    
+                }
+            }
+        }
+    }
+
+    public void initScore() {
+        if (highScore.equals("nobody:0")) {
+            highScore = this.getHighScore();
+        }
+    }
 
     @Override
     public void keyReleased(KeyEvent e) {
