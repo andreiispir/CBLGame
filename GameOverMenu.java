@@ -2,14 +2,13 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 
 public class GameOverMenu  {
    
     GameOverMenu(int collectedCoins) {
-        JFrame gameOverFrame = new JFrame("Game Over");
+        JFrame gameOverFrame = new JFrame("Game Over!");
         gameOverFrame.setSize(400, 300);
         gameOverFrame.setLocationRelativeTo(null);
         gameOverFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE); // Close only the Game Over frame
@@ -21,7 +20,7 @@ public class GameOverMenu  {
             }
         });
 
-        JLabel gameOverLabel = new JLabel("Game Over", JLabel.CENTER);
+        JLabel gameOverLabel = new JLabel("Game Over!", JLabel.CENTER);
         gameOverLabel.setFont(new Font("Arial", Font.BOLD, 24));
         gameOverLabel.setForeground(Color.WHITE);
 
