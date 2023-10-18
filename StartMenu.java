@@ -1,6 +1,6 @@
+import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.event.*;
-
 import java.net.URL;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -11,7 +11,7 @@ import javax.swing.JSlider;
 
 public class StartMenu extends JPanel {
     
-    protected Image menuBackground = new ImageIcon("").getImage();
+    protected Image menuBackground = new ImageIcon("Images\\menubckg.jpg").getImage();
     JSlider slider;
     MusicPlayer music = new MusicPlayer();
 
@@ -60,6 +60,12 @@ public class StartMenu extends JPanel {
         
     }
 
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        g.drawImage(menuBackground, 0, 0, getWidth(), getHeight(), this);
+    }
+    
     public void playMusic(URL url) {
         music.setFile(url);
         music.play(url);
