@@ -54,6 +54,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
             frame.setVisible(true);
         });
 
+
         //lastTrap = System.currentTimeMillis();
 
         System.out.println(System.currentTimeMillis() + " " + lastTrap);
@@ -347,6 +348,9 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
             }
         }
     }
+
+
+
 
     @Override
     public void keyReleased(KeyEvent e) {
