@@ -169,7 +169,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
                 // Character is colliding with the platform
                 //platformsCount++;
                 if (characterY > 485 && characterY <= 525) {
-                    new GameOver();
+                    new GameOverMenu(collectedCoins);
                     timer.cancel();
                 }
                 if (!isJumping && characterY < platform.getY()) {
@@ -198,7 +198,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
                 // Character is colliding with the platform
                 //platformsCount++;
                 if (characterY > 410 && characterY <= 450) {
-                    new GameOver();
+                    new GameOverMenu(collectedCoins);
                     timer.cancel();
                 }
                 if (!isJumping && characterY < platform.getY()) {
@@ -265,7 +265,11 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
             }
         }
 
-
+        /*
+        *    
+        * !!! RUNTIME ERRORS - TRAPS
+        *
+        */ 
         for (Trap trap : traps) {
             g.drawImage(trapImg, trap.getX(), trap.getY(), this);
         }
@@ -283,7 +287,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
 
         // Draw coin counter
         g.setColor(Color.YELLOW);
-        g.setFont(new Font("Tahoma", Font. BOLD, 17));
+        g.setFont(new Font("Tahoma", Font.BOLD, 17));
         g.drawString("Coins: " + collectedCoins, getWidth() - 100, 30);
         g.setColor(Color.RED);
         g.drawString("Life: " + lifeBar, getWidth() - 100, 60);
@@ -330,7 +334,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
             if (characterRect.intersects(trapRect) && !isInjured ) {
                 lifeBar -= 10; // Decrease the life bar by 10
                 if (lifeBar == 0) {
-                    new GameOver();
+                    new GameOverMenu(collectedCoins);
                     timer.cancel();
                 }
                 
@@ -348,8 +352,6 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
             }
         }
     }
-
-
 
 
     @Override

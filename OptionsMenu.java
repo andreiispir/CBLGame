@@ -17,7 +17,7 @@ public class OptionsMenu extends JPanel {
         this.music = music;
 
         JFrame optionsFrame = new JFrame("Adjust Volume");
-        optionsFrame.setSize(500, 400);
+        optionsFrame.setSize(500, 300);
         optionsFrame.setLocationRelativeTo(null);
         optionsFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE); // Close only the Game Over frame
 

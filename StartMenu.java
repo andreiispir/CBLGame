@@ -1,3 +1,5 @@
+import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.event.*;
@@ -8,10 +10,11 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
+import javax.swing.plaf.FontUIResource;
 
 public class StartMenu extends JPanel {
     
-    protected Image menuBackground = new ImageIcon("Images\\menubckg.jpg").getImage();
+    protected Image menuBackground = new ImageIcon("Images\\menu.jpg").getImage();
     JSlider slider;
     MusicPlayer music = new MusicPlayer();
 
@@ -20,14 +23,26 @@ public class StartMenu extends JPanel {
         startGame.setSize(600, 400);
         startGame.setLocationRelativeTo(null);
         startGame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE); // Close only the Game Over frame
-        
-        JLabel startLabel = new JLabel("");
+        startGame.add(this);
+
+        JLabel startLabel = new JLabel("") {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                g.drawImage(menuBackground, 0, 0, getWidth(), getHeight(), this);
+            }
+        };
+
         startLabel.setBounds(500, 400, 100, 100);
         startGame.add(startLabel);
         
         JButton b = new JButton("Start Game");
         b.setBounds(10, 10, 180, 30);
         b.setName("Start Game");
+        b.setForeground(Color.WHITE);
+        b.setBackground(Color.GRAY);
+        b.setFont(new Font("Tahoma", Font.BOLD, 14));
+        b.setFocusPainted(false);
         startLabel.add(b);
         startGame.setVisible(true);
 
@@ -42,8 +57,12 @@ public class StartMenu extends JPanel {
         playMusic(musicURL);
 
         JButton op = new JButton("Options");
-        op.setBounds(10, 60, 180, 30);
+        op.setBounds(10, 50, 180, 30);
         op.setName("Options");
+        op.setForeground(Color.WHITE);
+        op.setBackground(Color.GRAY);
+        op.setFont(new Font("Tahoma", Font.BOLD, 14));
+        op.setFocusPainted(false);
         startLabel.add(op);
 
         op.addActionListener(new ActionListener() {
@@ -58,12 +77,6 @@ public class StartMenu extends JPanel {
 
         
         
-    }
-
-    @Override
-    protected void paintComponent(Graphics g) {
-        super.paintComponent(g);
-        g.drawImage(menuBackground, 0, 0, getWidth(), getHeight(), this);
     }
     
     public void playMusic(URL url) {

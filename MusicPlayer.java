@@ -9,7 +9,7 @@ public class MusicPlayer {
     Clip clip;
 
     float previousVolume = 0;
-    float currentVolume = -20;
+    float currentVolume = -20.0f;
     FloatControl fc;
     
     public void setFile(URL url) {
