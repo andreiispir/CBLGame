@@ -48,13 +48,17 @@ public class GameOverMenu  {
         hScore.setBounds(10, 80, 300, 300);
         hScore.setForeground(Color.WHITE);
 
-        JButton closeButton = new JButton("Close") {
+        JButton closeButton = new JButton() {
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
                 g.drawImage(closeBckgr, 0, 0, getWidth(), getHeight(), this);
             }
         };
+
+        closeButton.setOpaque(false);
+        closeButton.setContentAreaFilled(false);
+        closeButton.setBorderPainted(false);
 
         closeButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {

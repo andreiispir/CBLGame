@@ -1,6 +1,7 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.geom.RoundRectangle2D;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -62,28 +63,32 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
             frame.add(this);
             frame.setVisible(true); 
 
-            JLabel label = new JLabel();
-            frame.add(label);
+            frame.setShape(new RoundRectangle2D.Double(0, 0, 1366, 768, 50, 50));
 
-            JButton closeButton = new JButton("Close") {
+            JLabel label = new JLabel();
+
+            JButton closeButton = new JButton() {
                 @Override
                 protected void paintComponent(Graphics g) {
                     super.paintComponent(g);
                     g.drawImage(closeBckgr, 0, 0, getWidth(), getHeight(), this);
                 }
             };
-    
+
             closeButton.setBounds(1200, 10, 30, 30);
-    
+            // closeButton.setOpaque(false);
+            // closeButton.setContentAreaFilled(false);
+            // closeButton.setBorderPainted(false);
+
             closeButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     new GameOverMenu(collectedCoins, highScore);
                     timer.cancel();
                 }
             });
-
-            label.add(closeButton);
             closeButton.setVisible(true);
+            label.add(closeButton);
+            frame.add(label);
         });
         
 
@@ -326,6 +331,8 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         g.setColor(Color.RED);
         g.drawString("Life: " + lifeBar, getWidth() - 100, 60);
         
+        //g.drawImage(closeBckgr, 1200, 10, 30, 30, this);
+    
         //g.drawString("HighScore: " + highScore, 0, 60);
 
 

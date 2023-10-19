@@ -3,6 +3,7 @@ import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.geom.RoundRectangle2D;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -18,6 +19,7 @@ public class OptionsMenu extends JPanel {
     JSlider slider = new JSlider();
 
     protected Image closeBckgr = new ImageIcon("src\\closeButton.png").getImage();
+    
 
     MusicPlayer music = new MusicPlayer();
 
@@ -25,21 +27,23 @@ public class OptionsMenu extends JPanel {
         this.music = music;
 
         JFrame optionsFrame = new JFrame("Adjust Volume");
-        optionsFrame.setSize(500, 300);
+        optionsFrame.setSize(350, 200);
         optionsFrame.setLocationRelativeTo(null);
         optionsFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE); // Close only the Game Over frame
         optionsFrame.setUndecorated(true);
         optionsFrame.getRootPane().setWindowDecorationStyle(JRootPane.NONE);
 
+        optionsFrame.setShape(new RoundRectangle2D.Double(0, 0, 350, 200, 50, 50));
+
         JLabel optionsLabel = new JLabel("Adjust Volume");
-        optionsLabel.setBounds(10,10, 10, 10);
+        optionsLabel.setBounds(50, 10, 30, 30);
         optionsLabel.setFont(new Font("Arial", Font.BOLD, 16));
 
         optionsFrame.add(optionsLabel);
         optionsFrame.setVisible(true);
         
         slider = new JSlider(-40, 6);
-        slider.setBounds(10, 70, 200, 50);
+        slider.setBounds(20, 100, 200, 50);
         slider.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent event) {
