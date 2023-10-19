@@ -17,16 +17,17 @@ import javax.swing.JRootPane;
 public class GameOverMenu  {
    
     protected Image closeBckgr = new ImageIcon("src\\closeButton.png").getImage();
+    protected Image gameOverBkg = new ImageIcon("src\\gameOverBkg.png").getImage();
 
     GameOverMenu(int collectedCoins, String highScore) {
         JFrame gameOverFrame = new JFrame("Game Over!");
-        gameOverFrame.setSize(400, 300);
+        gameOverFrame.setSize(500, 300);
         gameOverFrame.setLocationRelativeTo(null);
         gameOverFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE); // Close only the Game Over frame
         gameOverFrame.getContentPane().setBackground(Color.BLACK);
         gameOverFrame.setUndecorated(true);
         gameOverFrame.getRootPane().setWindowDecorationStyle(JRootPane.NONE);
-        gameOverFrame.setShape(new RoundRectangle2D.Double(0, 0, 400, 300, 50, 50));
+        gameOverFrame.setShape(new RoundRectangle2D.Double(0, 0, 500, 300, 50, 50));
         
         gameOverFrame.addWindowListener(new WindowAdapter() {
             public void windowClosed(WindowEvent e) {
@@ -34,7 +35,14 @@ public class GameOverMenu  {
             }
         });
 
-        JLabel gameOverLabel = new JLabel("Game Over!", JLabel.CENTER);
+        JLabel gameOverLabel = new JLabel("Game Over!", JLabel.CENTER) {
+                @Override
+                protected void paintComponent(Graphics g) {
+                    super.paintComponent(g);
+                    g.drawImage(gameOverBkg, 0, 0, getWidth(), getHeight(), this);
+                }
+            };
+
         gameOverLabel.setFont(new Font("Arial", Font.BOLD, 24));
         gameOverLabel.setForeground(Color.WHITE);
 
