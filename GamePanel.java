@@ -1,6 +1,7 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.geom.RoundRectangle2D;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -22,6 +23,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
     protected Image coinImg = new ImageIcon("src\\coinAnim2.gif").getImage(); // Load coin animation
     protected Image trapImg = new ImageIcon("src\\spikeTrap.gif").getImage(); // Load spike animation
     protected Image injuredImage = new ImageIcon("src\\injuredKnight.gif").getImage(); // Load injured animation
+    protected Image closeBckgr = new ImageIcon("src\\closeButton.png").getImage();
 
     private int characterX = 100; // Initial character X position
     private int characterY = 525; // Initial character Y position
@@ -54,12 +56,41 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
     public GamePanel() {
         SwingUtilities.invokeLater(() -> {
             JFrame frame = new JFrame("Side Scroller Game");
-            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             frame.setSize(1366, 768);
             frame.setLocationRelativeTo(null);
+            frame.setUndecorated(true);
+            frame.getRootPane().setWindowDecorationStyle(JRootPane.NONE);
             frame.add(this);
             frame.setVisible(true); 
+
+            frame.setShape(new RoundRectangle2D.Double(0, 0, 1366, 768, 50, 50));
+
+            JLabel label = new JLabel();
+
+            JButton closeButton = new JButton() {
+                @Override
+                protected void paintComponent(Graphics g) {
+                    super.paintComponent(g);
+                    g.drawImage(closeBckgr, 0, 0, getWidth(), getHeight(), this);
+                }
+            };
+
+            closeButton.setBounds(1200, 10, 30, 30);
+            // closeButton.setOpaque(false);
+            // closeButton.setContentAreaFilled(false);
+            // closeButton.setBorderPainted(false);
+
+            closeButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    new GameOverMenu(collectedCoins, highScore);
+                    timer.cancel();
+                }
+            });
+            closeButton.setVisible(true);
+            label.add(closeButton);
+            frame.add(label);
         });
+        
 
         //lastTrap = System.currentTimeMillis();
 
@@ -299,6 +330,9 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         g.drawString("Coins: " + collectedCoins, getWidth() - 100, 30);
         g.setColor(Color.RED);
         g.drawString("Life: " + lifeBar, getWidth() - 100, 60);
+        
+        //g.drawImage(closeBckgr, 1200, 10, 30, 30, this);
+    
         //g.drawString("HighScore: " + highScore, 0, 60);
 
 
