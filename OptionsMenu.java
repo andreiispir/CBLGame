@@ -1,13 +1,23 @@
 import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Image;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JRootPane;
 import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 public class OptionsMenu extends JPanel {
     JSlider slider = new JSlider();
+
+    protected Image closeBckgr = new ImageIcon("src\\closeButton.png").getImage();
 
     MusicPlayer music = new MusicPlayer();
 
@@ -18,6 +28,8 @@ public class OptionsMenu extends JPanel {
         optionsFrame.setSize(500, 300);
         optionsFrame.setLocationRelativeTo(null);
         optionsFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE); // Close only the Game Over frame
+        optionsFrame.setUndecorated(true);
+        optionsFrame.getRootPane().setWindowDecorationStyle(JRootPane.NONE);
 
         JLabel optionsLabel = new JLabel("Adjust Volume");
         optionsLabel.setBounds(10,10, 10, 10);
@@ -41,6 +53,25 @@ public class OptionsMenu extends JPanel {
         });
 
         optionsLabel.add(slider);
+
+
+        JButton closeButton = new JButton("Close") {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                g.drawImage(closeBckgr, 0, 0, getWidth(), getHeight(), this);
+            }
+        };
+
+        closeButton.setBounds(450, 10, 30, 30);
+
+        closeButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                optionsFrame.setVisible(false);
+            }
+        });
+
+        optionsLabel.add(closeButton);
         
         //URL musicURL = getClass().getResource("reginanoptii.wav");
         //playMusic(musicURL);
