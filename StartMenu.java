@@ -13,7 +13,7 @@ import javax.swing.JSlider;
 
 public class StartMenu extends JPanel {
     
-    protected Image menuBackground = new ImageIcon("src\\menu.jpg").getImage();
+    protected Image menuBackground = new ImageIcon("src\\startMenuBkg.png").getImage();
     JSlider slider;
     MusicPlayer music = new MusicPlayer();
 
