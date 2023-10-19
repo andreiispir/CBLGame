@@ -22,9 +22,11 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
     protected Image platformImage = new ImageIcon("src\\platformvar1.png").getImage(); // Platform image
     protected Image largePlatformImage = new ImageIcon("src\\platformvar2.png").getImage(); // Larger platform image
     protected Image coinImg = new ImageIcon("src\\coinAnim2.gif").getImage(); // Load coin animation
+    protected Image staticCoinImg = new ImageIcon("src\\staticCoin.png").getImage();
     protected Image trapImg = new ImageIcon("src\\spikeTrap.gif").getImage(); // Load spike animation
     protected Image injuredImage = new ImageIcon("src\\injuredKnight.gif").getImage(); // Load injured animation
     protected Image closeBckgr = new ImageIcon("src\\closeButton.png").getImage();
+
 
     private int characterX = 100; // Initial character X position
     private int characterY = 525; // Initial character Y position
@@ -328,7 +330,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         // Draw coin counter
         g.setColor(Color.YELLOW);
         g.setFont(new Font("Tahoma", Font.BOLD, 17));
-        g.drawImage(coinImg, getWidth()-140, 30, this);
+        g.drawImage(staticCoinImg, getWidth()-140, 30, this);
         g.drawString(String.valueOf(collectedCoins), getWidth() - 100, 54);
         g.setColor(Color.RED);
 

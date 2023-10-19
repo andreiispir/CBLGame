@@ -19,7 +19,7 @@ public class OptionsMenu extends JPanel {
     JSlider slider = new JSlider();
 
     protected Image closeBckgr = new ImageIcon("src\\closeButton.png").getImage();
-    protected Image optionsBkg = new ImageIcon("src\\optionsBkg.png").getImage();
+    protected Image optionsBkg = new ImageIcon("src\\volumeBkg.png").getImage();
 
 
     MusicPlayer music = new MusicPlayer();
@@ -44,14 +44,11 @@ public class OptionsMenu extends JPanel {
             }
         };
 
-        optionsLabel.setBounds(100, 100, 30, 30);
-        optionsLabel.setFont(new Font("Arial", Font.BOLD, 16));
-
         optionsFrame.add(optionsLabel);
         optionsFrame.setVisible(true);
         
         slider = new JSlider(-40, 6);
-        slider.setBounds(20, 100, 200, 50);
+        slider.setBounds(143, 105, 200, 50);
         slider.setOpaque(false);
         slider.addChangeListener(new ChangeListener() {
             @Override
