@@ -43,18 +43,18 @@ public class GameOverMenu  {
                 }
             };
 
-        gameOverLabel.setFont(new Font("Arial", Font.BOLD, 24));
+        gameOverLabel.setFont(new Font("Algerian", Font.BOLD, 24));
         gameOverLabel.setForeground(Color.WHITE);
 
-        JLabel score = new JLabel("Score: " + collectedCoins);
-        score.setFont(new Font("Arial", Font.BOLD, 18));
-        score.setBounds(10, 50, 300, 300);
-        score.setForeground(Color.WHITE);
+        JLabel score = new JLabel(String.valueOf(collectedCoins));
+        score.setFont(new Font("Algerian", Font.BOLD, 18));
+        score.setForeground(new Color(58, 59, 81));
+        score.setBounds(125, 24, 300, 300);
 
-        JLabel hScore = new JLabel("Highscore:  " + highScore);
-        hScore.setFont(new Font("Arial", Font.BOLD, 18));
-        hScore.setBounds(10, 80, 300, 300);
-        hScore.setForeground(Color.WHITE);
+        JLabel hScore = new JLabel(highScore);
+        hScore.setFont(new Font("Algerian", Font.BOLD, 18));
+        hScore.setForeground(new Color(58, 59, 81));
+        hScore.setBounds(165, 54, 300, 300);
 
         JButton closeButton = new JButton() {
             @Override
@@ -75,7 +75,7 @@ public class GameOverMenu  {
         });
 
 
-        closeButton.setBounds(340, 10, 30, 30);
+        closeButton.setBounds(450, 10, 30, 30);
         gameOverLabel.add(closeButton);
 
         gameOverFrame.add(gameOverLabel);

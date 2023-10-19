@@ -1,4 +1,3 @@
-import javax.imageio.plugins.jpeg.JPEGHuffmanTable;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -29,7 +28,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
 
 
     private int characterX = 100; // Initial character X position
-    private int characterY = 525; // Initial character Y position
+    private int characterY = 555; // Initial character Y position
     private int characterSpeedY = 0; // Character's vertical speed
     private int jumpHeight = 0; // Initialize jump height to 0
     private boolean isJumping = false;
@@ -54,6 +53,9 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
     private boolean isInjured = false; // Flag to track if the character is injured
     private boolean onPlatform = false; // Flag to track if the character is on a platform
     private boolean canDoubleJump = false; // Flag to track if the character can perform a double jump
+
+    JLabel healthBarLabel;
+    JProgressBar healthBar;
     
 
     public GamePanel() {
@@ -89,10 +91,25 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
                     timer.cancel();
                 }
             });
+            frame.add(label);
             closeButton.setVisible(true);
             label.add(closeButton);
-            frame.add(label);
-        });
+            
+
+            healthBar = new JProgressBar(0, 100);
+            //healthBar.setStringPainted(true);
+            healthBar.setValue(lifeBar);
+            healthBarLabel = new JLabel();
+            healthBarLabel.setBounds(getWidth() - 200, 90, 100, 30);
+            healthBar.setBounds(getWidth() - 200, 90, 100, 30);
+            healthBar.setForeground(Color.RED);
+            healthBar.setBackground(Color.DARK_GRAY);
+            add(healthBarLabel);
+            add(healthBar);
+
+
+            JLabel initText = new JLabel();
+        });        
         
 
         //lastTrap = System.currentTimeMillis();
@@ -127,7 +144,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
     public void generateLevel1() {
         int platformWidth = 120 + random.nextInt(20);
         int platformHeight = 50;
-        Platform platform = new Platform(getWidth() + 1300, 520, platformWidth, platformHeight);
+        Platform platform = new Platform(getWidth() + 1300, 535, platformWidth, platformHeight);
         platformsLevel1.add(platform);
 
         int numCoins = random.nextInt(3) + 1; // Generate 1 to 3 coins per platform
@@ -144,7 +161,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
     public void generateLevel2() {
         int platformWidth = 70 + random.nextInt(20);
         int platformHeight = 50;
-        Platform platform = new Platform(getWidth() + 1300, 450, platformWidth, platformHeight);
+        Platform platform = new Platform(getWidth() + 1300, 465, platformWidth, platformHeight);
         platformsLevel2.add(platform);
         
         int numCoins = random.nextInt(3) + 1; // Generate 1 to 3 coins per platform
@@ -157,13 +174,14 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         }
     }
 
+
     public void generateTrap() {
         int trapWidth = 30;
         int trapHeight = 30;
-
+        
         String[] trapY = {"496", "546"};
         int randomTrapY = random.nextInt(trapY.length);
-        Trap trap = new Trap(getWidth() + 2000,/* random.nextInt(randomTrapY)*/ 496, trapWidth, trapHeight);
+        Trap trap = new Trap(getWidth() + 2000,/* random.nextInt(randomTrapY)*/ 510, trapWidth, trapHeight);
         traps.add(trap);
     }
 
@@ -181,8 +199,8 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
 
         characterY += characterSpeedY;
 
-        if (characterY > 525) {
-            characterY = 525;
+        if (characterY > 555) {
+            characterY = 555;
             characterSpeedY = 0;
             canJump = true;
             jumpCount = 0; // Reset jump count when character lands
@@ -190,7 +208,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         characterRect.setBounds(characterX, characterY, 50, 50);
 
         // Check if the character is on a platform
-        if (characterY == 525 && !isJumping) {
+        if (characterY == 535 && !isJumping) {
             onPlatform = true;
             canDoubleJump = true; // Reset the ability to double jump when on a platform
         } else {
@@ -208,7 +226,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
                     && characterX + 50 > platform.getX() && characterX < platform.getX() + platform.getWidth()) {
                 // Character is colliding with the platform
                 //platformsCount++;
-                if (characterY > 485 && characterY <= 525) {
+                if (characterY > 515 && characterY <= 555) {
                     checkScore();
                     new GameOverMenu(collectedCoins, highScore);
                     timer.cancel();
@@ -238,7 +256,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
                     && characterX + 50 > platform.getX() && characterX < platform.getX() + platform.getWidth()) {
                 // Character is colliding with the platform
                 //platformsCount++;
-                if (characterY > 410 && characterY <= 450) {
+                if (characterY > 440 && characterY <= 480) {
                     checkScore();
                     new GameOverMenu(collectedCoins, highScore);
                     timer.cancel();
@@ -278,7 +296,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         }
         
         generateTrap();
-                                  
+
         repaint();
     }
 
@@ -334,13 +352,12 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         g.drawString(String.valueOf(collectedCoins), getWidth() - 100, 54);
         g.setColor(Color.RED);
 
-        //healthBarPanel = new JPanel();
-        g.drawString("Life: " + lifeBar, getWidth() - 160, 90);
+        healthBar.setValue(lifeBar);
+        g.setColor(Color.RED);
         
         //g.drawImage(closeBckgr, 1200, 10, 30, 30, this);
     
         //g.drawString("HighScore: " + highScore, 0, 60);
-
 
     }
 
@@ -407,7 +424,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
     }
 
 
-    public String getHighScore() {
+    public String getHighScore() { 
         
         FileReader readFile = null;
         BufferedReader reader = null;
@@ -478,6 +495,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
             highScore = this.getHighScore();
         }
     }
+
 
     @Override
     public void keyReleased(KeyEvent e) {
