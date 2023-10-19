@@ -1,3 +1,4 @@
+import javax.imageio.plugins.jpeg.JPEGHuffmanTable;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -327,9 +328,12 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         // Draw coin counter
         g.setColor(Color.YELLOW);
         g.setFont(new Font("Tahoma", Font.BOLD, 17));
-        g.drawString("Coins: " + collectedCoins, getWidth() - 100, 30);
+        g.drawImage(coinImg, getWidth()-140, 30, this);
+        g.drawString(String.valueOf(collectedCoins), getWidth() - 100, 54);
         g.setColor(Color.RED);
-        g.drawString("Life: " + lifeBar, getWidth() - 100, 60);
+
+        //healthBarPanel = new JPanel();
+        g.drawString("Life: " + lifeBar, getWidth() - 160, 90);
         
         //g.drawImage(closeBckgr, 1200, 10, 30, 30, this);
     
