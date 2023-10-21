@@ -17,10 +17,6 @@ public class Platform {
         x -= speed;
     }
 
-    public void moveCollision() {
-        x -= 3;
-    }
-
     public int getX() {
         return x;
     }

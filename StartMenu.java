@@ -24,7 +24,10 @@ public class StartMenu extends JPanel {
 
     JSlider slider;
     MusicPlayer music = new MusicPlayer();
+    URL menuURL = getClass().getResource("src\\menuMusic.wav");
+    URL gameURL = getClass().getResource("src\\gameMusic.wav");
 
+    int currentVolume;
     StartMenu() {
         JFrame startGame = new JFrame("Gravity Dash");
         startGame.setSize(600, 400);
@@ -62,15 +65,20 @@ public class StartMenu extends JPanel {
         startLabel.add(b);
         startGame.setVisible(true);
 
+
+        playMusic(menuURL);
+        music.currentVolume = currentVolume;
         b.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 startGame.setVisible(false);
                 new GamePanel().setVisible(true);
+                stopMusic(menuURL);
+                playMusic(gameURL);
+                music.fc.setValue(music.currentVolume);
             }
         });
 
-        URL musicURL = getClass().getResource("src\\reginanoptii.wav");
-        playMusic(musicURL);
+        
 
         JButton op = new JButton() {
             @Override
@@ -122,6 +130,10 @@ public class StartMenu extends JPanel {
         music.setFile(url);
         music.play(url);
         music.loop(url);
+    }
+
+    public void stopMusic(URL url) {
+        music.clip.stop();
     }
     
 
