@@ -1,6 +1,13 @@
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Image;
+import java.awt.Rectangle;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.geom.RoundRectangle2D;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -12,8 +19,18 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
-import java.util.TimerTask;
 import java.util.Timer;
+import java.util.TimerTask;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JProgressBar;
+import javax.swing.JRootPane;
+import javax.swing.SwingUtilities;
+
 
 public class GamePanel extends JPanel implements ActionListener, KeyListener {
 
@@ -49,18 +66,17 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
     private int collectedCoins = 0; // Counter for collected coins
     private String highScore = "nobody:0"; // The high score
     private int lifeBar = 100; // Initialize life bar to 100
-    private boolean collisionCheck = false; // Flag to track if the character has collided with a trap
     private boolean isInjured = false; // Flag to track if the character is injured
     private boolean onPlatform = false; // Flag to track if the character is on a platform
     private boolean canDoubleJump = false; // Flag to track if the character can perform a double jump
 
-    JProgressBar healthBar;
+    private JProgressBar healthBar;
     
 
     public GamePanel() {
         SwingUtilities.invokeLater(() -> {
             JFrame frame = new JFrame("Side Scroller Game");
-            frame.setSize(1366, 600);
+            frame.setSize(1366, 768);
             frame.setLocationRelativeTo(null);
             frame.setUndecorated(true);
             frame.getRootPane().setWindowDecorationStyle(JRootPane.NONE);
@@ -75,14 +91,14 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
                 @Override
                 protected void paintComponent(Graphics g) {
                     super.paintComponent(g);
-                    g.drawImage(closeBckgr, 0, 0, getWidth(), getHeight(), this);
+                    g.drawImage(closeBckgr, 0, 0, 30, 30, this);
                 }
             };
 
-            closeButton.setBounds(1200, 10, 30, 30);
-            // closeButton.setOpaque(false);
-            // closeButton.setContentAreaFilled(false);
-            // closeButton.setBorderPainted(false);
+            closeButton.setBounds(getWidth()-250, 10, 30, 30);
+            closeButton.setOpaque(false);
+            closeButton.setContentAreaFilled(false);
+            closeButton.setBorderPainted(false);
 
             closeButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
@@ -92,7 +108,8 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
             });
             frame.add(label);
             closeButton.setVisible(true);
-            label.add(closeButton);
+            //label.add(closeButton);
+            frame.add(closeButton);
             
 
             healthBar = new JProgressBar(0, 100);
@@ -103,14 +120,13 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
             healthBar.setBounds(getWidth() - 200, 90, 100, 10);
             healthBar.setForeground(Color.RED);
             healthBar.setBackground(Color.DARK_GRAY);
-            // add(healthBarLabel);
-            // add(healthBar);
         
             healthBar.setVisible(true);
 
             label.add(healthBar);
+            label.setVisible(true);
+            frame.setVisible(true);
 
-            JLabel initText = new JLabel();
         });        
         
 
@@ -147,6 +163,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         requestFocus();
     }
 
+    private Platform lastPlatformLevel2;
     public void generateLevel1() {
         int platformWidth = 120 + random.nextInt(20);
         int platformHeight = 50;
@@ -164,15 +181,26 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
 
         int trapWidth = 30;
         int trapHeight = 30;
-        String[] trapY = {"496", "546"};
-        int randomTrapY = random.nextInt(trapY.length);
+
+        String[] trapY = {"530", "385"};
+        int randomIndex = random.nextInt(trapY.length);
+        String randomTrapY = trapY[randomIndex];
         if (System.currentTimeMillis() - lastTrap >= 3000) {
-            Trap trap = new Trap(platform.getX(), /*random.nextInt(randomTrapY)*/ 530, trapWidth, trapHeight);
-            traps.add(trap);
-            lastTrap = System.currentTimeMillis();
+            //System.out.println(randomTrapY);
+            if (randomTrapY.equals("385") && lastPlatformLevel2 != null) {
+                // Generate the trap on the last platform of Level 2 if trapY is "385"
+                Trap trap = new Trap(lastPlatformLevel2.getX(), Integer.parseInt(randomTrapY), trapWidth, trapHeight);
+                traps.add(trap);
+                lastTrap = System.currentTimeMillis();
+            } else {
+                // Otherwise, generate the trap on the Level 1 platform
+                Trap trap = new Trap(platform.getX(), Integer.parseInt(randomTrapY), trapWidth, trapHeight);
+                traps.add(trap);
+                lastTrap = System.currentTimeMillis();
+            }
         }
 
-        System.out.println("l1 called");
+        //System.out.println("l1 called");
         
     }
 
@@ -180,6 +208,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         int platformWidth = 70 + random.nextInt(20);
         int platformHeight = 50;
         Platform platform = new Platform(getWidth() + 1300, 405, platformWidth, platformHeight);
+        lastPlatformLevel2 = platform; // To obtain Y-axis coordinates for generating traps on Level 2
         platformsLevel2.add(platform);
         
         int numCoins = random.nextInt(3) + 1; // Generate 1 to 3 coins per platform
@@ -188,24 +217,23 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
             int coinY = platform.getY() - 30; // Place the coin above the platform
             Coin coin = new Coin(coinX, coinY);
             coins.add(coin);
-            //coin.moveLeft();
         }
         
-        System.out.println("l2 called");
+        //System.out.println("l2 called");
     }
 
 
-    public void generateTrap() {
-        if (System.currentTimeMillis() - lastTrap >= 2000) {
-            int trapWidth = 30;
-            int trapHeight = 30;
-            String[] trapY = {"496", "546"};
-            int randomTrapY = random.nextInt(trapY.length);
-            Trap trap = new Trap(getWidth() + 2450, /*random.nextInt(randomTrapY)*/ 530, trapWidth, trapHeight);
-            traps.add(trap);
-            lastTrap = System.currentTimeMillis(); // Update the time of the last trap generated
-        }
-    }
+    // public void generateTrap() {
+    //     if (System.currentTimeMillis() - lastTrap >= 2000) {
+    //         int trapWidth = 30;
+    //         int trapHeight = 30;
+    //         String[] trapY = {"496", "546"};
+    //         int randomTrapY = random.nextInt(trapY.length);
+    //         Trap trap = new Trap(getWidth() + 2450, /*random.nextInt(randomTrapY)*/ 530, trapWidth, trapHeight);
+    //         traps.add(trap);
+    //         lastTrap = System.currentTimeMillis(); // Update the time of the last trap generated
+    //     }
+    // }
 
     @Override
     public void actionPerformed(ActionEvent e) {
@@ -242,9 +270,8 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         Iterator<Coin> iteratorCoin = coins.iterator();
         Iterator<Trap> iteratorTrap = traps.iterator();
         while (iteratorLevel1.hasNext()) {
-            Platform platform = iteratorLevel1.next();
+            Platform platform = iteratorLevel1.next(); // Y = 555 || characterY on platform = 468 (555-87)
             Coin coin = iteratorCoin.next();
-            //Trap trap = iteratorTrap.next();
             if (characterY + 87 > platform.getY() && characterY < platform.getY() + platform.getHeight()
                     && characterX + 87 > platform.getX() && characterX < platform.getX() + platform.getWidth()) {
                 // Character is colliding with the platform
@@ -263,14 +290,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
             }
 
 
-            if (iteratorTrap.hasNext()) {
-                Trap trap = iteratorTrap.next();
-                trap.moveLeft();
-                if (trap.getX() + trap.getWidth() < 0) {
-                // Trap is out of the screen
-                iteratorTrap.remove();
-            }
-            }
+            
 
             platform.moveLeft();
             coin.moveLeft();
@@ -284,31 +304,44 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
                 // Coin is out of the screen
                 iteratorCoin.remove();
             }
+            
+            if (iteratorTrap.hasNext()) {
+                Trap trap = iteratorTrap.next();
+                trap.moveLeft();
+                if (trap.getX() + trap.getWidth() < 0) {
+                    // Trap is out of the screen
+                    iteratorTrap.remove();
+                }
+            }
         
-            // if (trap.getX() + trap.getWidth() < 0) {
-            //     // Trap is out of the screen
-            //     iteratorTrap.remove();
-            // }
         }
 
         Iterator<Platform> iteratorLevel2 = platformsLevel2.iterator();
         while (iteratorLevel2.hasNext()) {
-            Platform platform = iteratorLevel2.next();
+            Platform platform = iteratorLevel2.next(); // Y = 405 || characterY on platform = 318 (405-87)
             Coin coin = iteratorCoin.next();
             if (characterY + 87 > platform.getY() && characterY < platform.getY()
                     && characterX + 87 > platform.getX() && characterX < platform.getX() + platform.getWidth()) {
                 // Character is colliding with the platform
-                //platformsCount++;
-                if (characterY > 368 && characterY <= 405) {
+                if (characterY > 330 && characterY < 405) {
                     checkScore();
                     new GameOverMenu(collectedCoins, highScore);
                     timer.cancel();
                 }
+
+                if (isJumping && characterY - 87 == platform.getY()) {
+                    characterY = platform.getY() + 88;
+                    isJumping = false;
+                    jumpHeight = 0;
+                }
+
                 if (!isJumping && characterY < platform.getY()) {
                     // Character is above the platform, reset its vertical position
                     characterY = platform.getY() - 87;
                     canJump = true; // Enable jumping when on the platform
                 }
+
+                
             }
 
             platform.moveLeft();
@@ -328,12 +361,12 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         checkTrapCollision();
 
         // Generate new platforms for Level 1
-        if (System.currentTimeMillis() - lastPlatformTimeLevel1 >= random.nextInt(2000, 4000)) {
+        if (System.currentTimeMillis() - lastPlatformTimeLevel1 >= random.nextInt(2000, 3500)) {
             generateLevel1();
             lastPlatformTimeLevel1 = System.currentTimeMillis();
         }
         // Generate new platforms for Level 2
-        if (System.currentTimeMillis() - lastPlatformTimeLevel2 >= random.nextInt(2500, 4000)) {
+        if (System.currentTimeMillis() - lastPlatformTimeLevel2 >= random.nextInt(2200, 4000)) {
             generateLevel2();
             lastPlatformTimeLevel2 = System.currentTimeMillis();
         }

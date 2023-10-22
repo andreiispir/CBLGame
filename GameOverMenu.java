@@ -23,7 +23,6 @@ public class GameOverMenu  {
         JFrame gameOverFrame = new JFrame("Game Over!");
         gameOverFrame.setSize(500, 300);
         gameOverFrame.setLocationRelativeTo(null);
-        gameOverFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE); // Close only the Game Over frame
         gameOverFrame.getContentPane().setBackground(Color.BLACK);
         gameOverFrame.setUndecorated(true);
         gameOverFrame.getRootPane().setWindowDecorationStyle(JRootPane.NONE);
@@ -55,6 +54,27 @@ public class GameOverMenu  {
         hScore.setFont(new Font("Algerian", Font.BOLD, 18));
         hScore.setForeground(new Color(58, 59, 81));
         hScore.setBounds(165, 54, 300, 300);
+
+        JButton retryButton = new JButton("Retry") {
+            // @Override
+            // protected void paintComponent(Graphics g) {
+            //     super.paintComponent(g);
+            //     //g.drawImage(retryImg, 0, 0, getWidth(), getHeight(), this);
+            // }
+        };
+
+        // retryButton.setOpaque(false);
+        // retryButton.setContentAreaFilled(false);
+        // retryButton.setBorderPainted(false);
+
+        retryButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                new GamePanel().setVisible(true);
+            }
+        });
+
+        retryButton.setBounds(250, 100, 50, 50);
+        gameOverLabel.add(retryButton);
 
         JButton closeButton = new JButton() {
             @Override
