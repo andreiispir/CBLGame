@@ -1,5 +1,4 @@
 import java.net.URL;
-
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
@@ -17,7 +16,7 @@ public class MusicPlayer {
             AudioInputStream audioInput = AudioSystem.getAudioInputStream(url);
             clip = AudioSystem.getClip();
             clip.open(audioInput);
-            fc = (FloatControl)clip.getControl(FloatControl.Type.MASTER_GAIN);
+            fc = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
 
         } catch (Exception e) {
 
@@ -33,23 +32,4 @@ public class MusicPlayer {
         clip.loop(Clip.LOOP_CONTINUOUSLY);
     }
 
-    // public void volumeUp() {
-    //     currentVolume += 1.0f;
-
-    //     if (currentVolume > 6.0f) {
-    //         currentVolume = 6.0f;
-    //     }
-
-    //     fc.setValue(currentVolume);
-    // }
-
-    // public void volumeDown() {
-    //     currentVolume -= 1.0f;
-
-    //     if (currentVolume < -80.0f) {
-    //         currentVolume = -80.0f;
-    //     }
-
-    //     fc.setValue(currentVolume);
-    // }
 }

@@ -28,7 +28,7 @@ public class StartMenu extends JPanel {
         JFrame startGame = new JFrame("Gravity Dash");
         startGame.setSize(600, 400);
         startGame.setLocationRelativeTo(null);
-        startGame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE); // Close only the Game Over frame
+        startGame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         startGame.add(this);
         startGame.setUndecorated(true);
         startGame.getRootPane().setWindowDecorationStyle(JRootPane.NONE);
@@ -47,12 +47,13 @@ public class StartMenu extends JPanel {
         startGame.add(startLabel);
         
         JButton b = new JButton("") {
-                 @Override
+            @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
                 g.drawImage(newGameButton, 0, 0, getWidth(), getHeight(), this);
             }
         };
+
         b.setBounds(200, 200, 180, 30);
         b.setFocusPainted(false);
         b.setOpaque(false);

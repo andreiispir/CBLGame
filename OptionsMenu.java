@@ -3,7 +3,6 @@ import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.geom.RoundRectangle2D;
-
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -29,7 +28,7 @@ public class OptionsMenu extends JPanel {
         JFrame optionsFrame = new JFrame("Adjust Volume");
         optionsFrame.setSize(500, 250);
         optionsFrame.setLocationRelativeTo(null);
-        optionsFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE); // Close only the Game Over frame
+        optionsFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         optionsFrame.setUndecorated(true);
         optionsFrame.getRootPane().setWindowDecorationStyle(JRootPane.NONE);
 
