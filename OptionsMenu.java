@@ -19,7 +19,6 @@ public class OptionsMenu extends JPanel {
     protected Image closeBckgr = new ImageIcon("src\\closeButton.png").getImage();
     protected Image optionsBkg = new ImageIcon("src\\volumeBkg.png").getImage();
 
-
     MusicPlayer music = new MusicPlayer();
 
     OptionsMenu(MusicPlayer music) {
@@ -83,9 +82,6 @@ public class OptionsMenu extends JPanel {
         });
 
         optionsLabel.add(closeButton);
-        
-        //URL musicURL = getClass().getResource("reginanoptii.wav");
-        //playMusic(musicURL);
     }
 
 }

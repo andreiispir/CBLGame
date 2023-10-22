@@ -38,6 +38,9 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
     protected Image walkImg = new ImageIcon("src\\knightWalk.gif").getImage();
     protected Image injuredImage = new ImageIcon("src\\injuredKnight.gif").getImage();
     
+    // Load background image
+    private Image backgroundImage = new ImageIcon("src\\background2.png").getImage();
+
     // Load platform images
     protected Image platformImage = new ImageIcon("src\\platformvar1.png").getImage(); 
     protected Image largePlatformImage = new ImageIcon("src\\platformvar2.png").getImage();
@@ -53,34 +56,44 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
     protected Image closeBckgr = new ImageIcon("src\\closeButton.png").getImage();
 
 
+    // Character variables
     private int characterX = 100; // Initial character X position
     private int characterY = 518; // Initial character Y position
     private int characterSpeedY = 0; // Character's vertical speed
+
+    // Jump algorithm variables
     private int jumpHeight = 0; // Initialize jump height to 0
     private boolean isJumping = false;
     private boolean canJump = true; // Add a boolean flag to track if the player can jump
+    private int jumpCount = 0; // Track the number of jumps
+    private boolean onPlatform = false; // Flag to track if the character is on a platform
+    private boolean canDoubleJump = false; // Flag to track if double jump is permitted
+    private static final int MAX_JUMP_COUNT = 2; // Maximum allowed jumps
+
+    // Timer variables
     private Timer timer;
     private long lastPlatformTimeLevel1 = System.currentTimeMillis();
     private long lastPlatformTimeLevel2 = System.currentTimeMillis();
     private long lastTrap = System.currentTimeMillis();
-    private Rectangle characterRect;
-    private Image backgroundImage;
+
+    // Initialize character rectangle for collision detection
+    private Rectangle characterRect = new Rectangle(characterX, characterY, 50, 50);
+    private Random random = new Random();
+    
     private List<Platform> platformsLevel1 = new ArrayList<>();
     private List<Platform> platformsLevel2 = new ArrayList<>();
-    private Random random = new Random();
-    private int jumpCount = 0; // Track the number of jumps
-    private static final int MAX_JUMP_COUNT = 2; // Maximum allowed jumps
     private List<Coin> coins = new ArrayList<>();
     private List<Trap> traps = new ArrayList<>();
+
     private int collectedCoins = 0; // Counter for collected coins
+
     private String highScore = "nobody:0"; // The high score
-    private int lifeBar = 100; // Initialize life bar to 100
-    private boolean isInjured = false; // Flag to track if the character is injured
-    private boolean onPlatform = false; // Flag to track if the character is on a platform
-    private boolean canDoubleJump = false; // Flag to track if double jump is permitted
 
     private JProgressBar healthBar;
-    
+    private int lifeBar = 100; // Initialize life bar to 100
+
+    private boolean isInjured = false; // Flag to track if the character is injured
+
 
     public GamePanel() {
         SwingUtilities.invokeLater(() -> {
@@ -139,8 +152,6 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         });        
         
 
-        //lastTrap = System.currentTimeMillis();
-
         System.out.println(System.currentTimeMillis() + " " + lastTrap);
         timer = new Timer();
         timer.scheduleAtFixedRate(new TimerTask() {
@@ -150,11 +161,6 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
             }
         }, 0, 20); // Adjust the delay as needed
 
-        // Initialize character rectangle for collision detection
-        characterRect = new Rectangle(characterX, characterY, 50, 50);
-
-        // Load background image
-        backgroundImage = new ImageIcon("src\\background2.png").getImage();
 
         System.out.println(traps.size() + "Traps");
         System.out.println(platformsLevel1.size());
@@ -181,15 +187,16 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         Platform platform = new Platform(getWidth() + 1300, 555, platformWidth, platformHeight);
         platformsLevel1.add(platform);
 
+        // Coins generation logic
         int numCoins = random.nextInt(3) + 1; // Generate 1 to 3 coins per platform
         for (int i = 0; i < numCoins; i++) {
             int coinX = platform.getX() + random.nextInt(platform.getWidth() - 40);
             int coinY = platform.getY() - 30; // Place the coin above the platform
             Coin coin = new Coin(coinX, coinY);
             coins.add(coin);
-            //coin.moveLeft();
         }
 
+        // Trap generation logic
         int trapWidth = 30;
         int trapHeight = 30;
 
@@ -224,6 +231,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         lastPlatformLevel2 = platform; // To obtain Y-axis for generating traps on Level 2
         platformsLevel2.add(platform);
         
+        // Coins generation logic
         int numCoins = random.nextInt(3) + 1; // Generate 1 to 3 coins per platform
         for (int i = 0; i < numCoins; i++) {
             int coinX = platform.getX() + random.nextInt(platform.getWidth() - 40);
@@ -234,20 +242,6 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         
         //System.out.println("l2 called");
     }
-
-
-    // public void generateTrap() {
-    //     if (System.currentTimeMillis() - lastTrap >= 2000) {
-    //         int trapWidth = 30;
-    //         int trapHeight = 30;
-    //         String[] trapY = {"496", "546"};
-    //         int randomTrapY = random.nextInt(trapY.length);
-    //         Trap trap = new Trap(getWidth() + 2450, 
-    //                      random.nextInt(randomTrapY), trapWidth, trapHeight);
-    //         traps.add(trap);
-    //         lastTrap = System.currentTimeMillis(); // Update the time of the last trap generated
-    //     }
-    // }
 
     @Override
     public void actionPerformed(ActionEvent e) {
@@ -280,6 +274,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
             onPlatform = false;
         }
 
+        // Collision check level 1
         Iterator<Platform> iteratorLevel1 = platformsLevel1.iterator();
         Iterator<Coin> iteratorCoin = coins.iterator();
         Iterator<Trap> iteratorTrap = traps.iterator();
@@ -303,17 +298,14 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
                 }
             }
 
-
-            
-
             platform.moveLeft();
             coin.moveLeft();
-
 
             if (platform.getX() + platform.getWidth() <= 0) {
                 // Remove platforms that are out of the screen
                 iteratorLevel1.remove();
             }
+
             if (coin.getX() + 30 < 0) {
                 // Coin is out of the screen
                 iteratorCoin.remove();
@@ -327,9 +319,9 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
                     iteratorTrap.remove();
                 }
             }
-        
         }
 
+        // Collision check level 2
         Iterator<Platform> iteratorLevel2 = platformsLevel2.iterator();
         while (iteratorLevel2.hasNext()) {
             Platform platform = iteratorLevel2.next(); // Y = 405 || characterY on platform = 318
@@ -344,6 +336,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
                     timer.cancel();
                 }
 
+                // TO SOLVE 
                 if (isJumping && characterY - 87 == platform.getY()) {
                     characterY = platform.getY() + 88;
                     isJumping = false;
@@ -355,17 +348,19 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
                     characterY = platform.getY() - 87;
                     canJump = true; // Enable jumping when on the platform
                 }
-
-                
             }
 
             platform.moveLeft();
             coin.moveLeft();
 
-
             if (platform.getX() + platform.getWidth() <= 0) {
                 // Remove platforms that are out of the screen
                 iteratorLevel2.remove();
+            }
+
+            if (coin.getX() + 30 < 0) {
+                // Coin is out of the screen
+                iteratorCoin.remove();
             }
         }
         
@@ -385,14 +380,6 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
             generateLevel2();
             lastPlatformTimeLevel2 = System.currentTimeMillis();
         }
-        
-        
-        // if (System.currentTimeMillis() - lastTrap >= random.nextInt(2500, 4000)) {
-        //     generateTrap();
-        //     lastTrap = System.currentTimeMillis();
-        // }
-
-        //generateTrap();
 
         repaint();
     }
@@ -403,12 +390,12 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
 
         g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
 
-        g.setColor(Color.RED); // Set the color to red for Level 1 Platforms
+        // Draw platforms on level 1
         for (Platform platform :platformsLevel1) {
             g.drawImage(largePlatformImage, platform.getX(), platform.getY(), this);
         }
 
-        g.setColor(Color.GREEN); // Set the color to green for Level 2 platforms
+        // Draw platforms on level 2
         for (Platform platform : platformsLevel2) {
             g.drawImage(platformImage, platform.getX(), platform.getY(), this);
         }
@@ -420,40 +407,35 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
             }
         }
 
+        // Draw traps
         for (Trap trap : traps) {
             g.drawImage(trapImg, trap.getX(), trap.getY(), this);
         }
 
         Toolkit.getDefaultToolkit().sync();
-
-        //Graphics2D g2d = (Graphics2D) g;
         
+        // Draw injured image when colliding with traps
         if (isInjured) {
             g.drawImage(injuredImage, characterX, characterY, this);
         } else {
             g.drawImage(walkImg, characterX, characterY, this);
         }
-        //g2d.drawImage(walkImg, characterX, characterY, this);
+
+        // Edit highscore
         initScore();
-        // Draw coin counter
+
         g.setColor(Color.YELLOW);
         g.setFont(new Font("Tahoma", Font.BOLD, 17));
         g.drawImage(staticCoinImg, getWidth() - 140, 30, this);
+
         g.drawString(String.valueOf(collectedCoins), getWidth() - 100, 54);
         g.drawString(String.valueOf(characterY), getWidth() - 300, 100);
-
         g.drawString(String.valueOf(lifeBar), getWidth() - 350, 100);
 
         g.setColor(Color.RED);
 
-
         healthBar.setValue(lifeBar);
         g.setColor(Color.RED);
-        
-        //g.drawImage(closeBckgr, 1200, 10, 30, 30, this);
-    
-        //g.drawString("HighScore: " + highScore, 0, 60);
-
     }
 
     @Override
@@ -486,7 +468,6 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
                 collectedCoins++; // Increment the coin counter
             }
         }
-
     }
     
 
@@ -514,14 +495,12 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
                         injuredTime.cancel();
                     }
                 }, 1000);
-                //lastTrapTime = System.currentTimeMillis();
             }
         }
     }
 
 
     public String getHighScore() { 
-        
         FileReader readFile = null;
         BufferedReader reader = null;
 
@@ -540,11 +519,9 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
                 e.printStackTrace();
             }
         }
-        
     }
 
     public void checkScore() {
-
         System.out.println(highScore);
         if (highScore.equals("")) {
             return;
@@ -593,7 +570,6 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
             highScore = this.getHighScore();
         }
     }
-
 
     @Override
     public void keyReleased(KeyEvent e) {

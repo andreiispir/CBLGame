@@ -24,6 +24,7 @@ public class StartMenu extends JPanel {
     URL gameURL = getClass().getResource("src\\gameMusic.wav");
 
     int currentVolume;
+
     StartMenu() {
         JFrame startGame = new JFrame("Gravity Dash");
         startGame.setSize(600, 400);
@@ -132,6 +133,4 @@ public class StartMenu extends JPanel {
     public void stopMusic(URL url) {
         music.clip.stop();
     }
-    
-
 }

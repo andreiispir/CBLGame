@@ -93,15 +93,12 @@ public class GameOverMenu  {
             }
         });
 
-
         closeButton.setBounds(450, 10, 30, 30);
-        gameOverLabel.add(closeButton);
 
+        gameOverLabel.add(closeButton);
         gameOverFrame.add(gameOverLabel);
         gameOverLabel.add(score);
         gameOverLabel.add(hScore);
         gameOverFrame.setVisible(true);
-    }
-    
-    
+    }   
 }
