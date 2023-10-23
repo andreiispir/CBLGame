@@ -13,12 +13,20 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JRootPane;
 
+/**
+ * 'GameOverMenu' class represents the game over menu panel.
+ */
 public class GameOverMenu  {
    
     protected Image closeBckgr = new ImageIcon("src\\closeButton.png").getImage();
     protected Image gameOverBkg = new ImageIcon("src\\gameOverBkg.png").getImage();
+    protected Image retryImg = new ImageIcon("src\\retryButton.png").getImage();
+    protected Image iconImg = new ImageIcon("src\\iconImg.png").getImage();
 
-    GameOverMenu(int collectedCoins, String highScore) {
+    /**
+     * Initialize the game over frame.
+     */
+    GameOverMenu(int collectedCoins, String highScore, JFrame previousFrame) {
         JFrame gameOverFrame = new JFrame("Game Over!");
         gameOverFrame.setSize(500, 300);
         gameOverFrame.setLocationRelativeTo(null);
@@ -26,6 +34,7 @@ public class GameOverMenu  {
         gameOverFrame.setUndecorated(true);
         gameOverFrame.getRootPane().setWindowDecorationStyle(JRootPane.NONE);
         gameOverFrame.setShape(new RoundRectangle2D.Double(0, 0, 500, 300, 50, 50));
+        gameOverFrame.setIconImage(iconImg);
         
         gameOverFrame.addWindowListener(new WindowAdapter() {
             public void windowClosed(WindowEvent e) {
@@ -54,7 +63,7 @@ public class GameOverMenu  {
         hScore.setForeground(new Color(58, 59, 81));
         hScore.setBounds(165, 54, 300, 300);
 
-        JButton retryButton = new JButton("Retry") {
+        JButton retryButton = new JButton() {
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
@@ -62,17 +71,19 @@ public class GameOverMenu  {
             }
         };
 
-        // retryButton.setOpaque(false);
-        // retryButton.setContentAreaFilled(false);
-        // retryButton.setBorderPainted(false);
+        retryButton.setOpaque(false);
+        retryButton.setContentAreaFilled(false);
+        retryButton.setBorderPainted(false);
 
         retryButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+                previousFrame.setVisible(false);
+                gameOverFrame.setVisible(false);
                 new GamePanel().setVisible(true);
             }
         });
 
-        retryButton.setBounds(250, 100, 50, 50);
+        retryButton.setBounds(197, 110, 95, 30);
         gameOverLabel.add(retryButton);
 
         JButton closeButton = new JButton() {

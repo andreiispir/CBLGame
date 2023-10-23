@@ -22,16 +22,17 @@ import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 import javax.swing.ImageIcon;
-import javax.swing.JButton;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JRootPane;
 import javax.swing.SwingUtilities;
 
-
+/**
+ * The `GamePanel` class represents the main panel for the side-scrolling game.
+ * It handles game logic, rendering, collision detection, and user interactions.
+ */
 public class GamePanel extends JPanel implements ActionListener, KeyListener {
 
     // Load walking animations
@@ -50,11 +51,10 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
     protected Image staticCoinImg = new ImageIcon("src\\staticCoin.png").getImage();
     
     // Load trap animation
-    protected Image trapImg = new ImageIcon("src\\spikeTrap.gif").getImage();    
-
-    // Load close game button
-    protected Image closeBckgr = new ImageIcon("src\\closeButton.png").getImage();
-
+    protected Image trapImg = new ImageIcon("src\\spikeTrap.gif").getImage();   
+    
+    // Load icon image
+    protected Image iconImg = new ImageIcon("src\\iconImg.png").getImage();
 
     // Character variables
     private int characterX = 100; // Initial character X position
@@ -75,6 +75,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
     private long lastPlatformTimeLevel1 = System.currentTimeMillis();
     private long lastPlatformTimeLevel2 = System.currentTimeMillis();
     private long lastTrap = System.currentTimeMillis();
+    private long lastIncrease = System.currentTimeMillis();
 
     // Initialize character rectangle for collision detection
     private Rectangle characterRect = new Rectangle(characterX, characterY, 50, 50);
@@ -94,79 +95,41 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
 
     private boolean isInjured = false; // Flag to track if the character is injured
 
-
+    private JFrame frame = new JFrame("Side Scroller Game");
+    
+    /**
+     * Constructor for the 'GamePanel' class. Initializes the game and sets up
+     * the game window.
+     */
     public GamePanel() {
         SwingUtilities.invokeLater(() -> {
-            JFrame frame = new JFrame("Side Scroller Game");
             frame.setSize(1366, 768);
             frame.setLocationRelativeTo(null);
             frame.setUndecorated(true);
             frame.getRootPane().setWindowDecorationStyle(JRootPane.NONE);
             frame.add(this);
             frame.setVisible(true); 
+            frame.setIconImage(iconImg);
 
             frame.setShape(new RoundRectangle2D.Double(0, 0, 1366, 768, 50, 50));
 
-            JLabel label = new JLabel();
-
-            JButton closeButton = new JButton() {
-                @Override
-                protected void paintComponent(Graphics g) {
-                    super.paintComponent(g);
-                    g.drawImage(closeBckgr, 0, 0, 30, 30, this);
-                }
-            };
-
-            closeButton.setBounds(getWidth() - 250, 10, 30, 30);
-            closeButton.setOpaque(false);
-            closeButton.setContentAreaFilled(false);
-            closeButton.setBorderPainted(false);
-
-            closeButton.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    new GameOverMenu(collectedCoins, highScore);
-                    timer.cancel();
-                }
-            });
-            frame.add(label);
-            closeButton.setVisible(true);
-            //label.add(closeButton);
-            frame.add(closeButton);
-            
-
             healthBar = new JProgressBar(0, 100);
-            //healthBar.setStringPainted(true);
             healthBar.setValue(lifeBar);
-
-            System.out.println(getWidth());
-            healthBar.setBounds(getWidth() - 200, 90, 100, 10);
-            healthBar.setForeground(Color.RED);
-            healthBar.setBackground(Color.DARK_GRAY);
-        
+            healthBar.setForeground(new Color(58, 59, 81));
+            healthBar.setBackground(new Color(123, 125, 166));
             healthBar.setVisible(true);
 
-            frame.add(healthBar);
-            label.add(healthBar);
-            label.setVisible(true);
-            frame.setVisible(true);
-
-
-
+            frame.setLayout(null); // Set a null layout
+            this.add(healthBar);
         });        
         
-
-        System.out.println(System.currentTimeMillis() + " " + lastTrap);
         timer = new Timer();
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
                 actionPerformed(null); // Call your game loop logic
             }
-        }, 0, 20); // Adjust the delay as needed
-
-
-        System.out.println(traps.size() + "Traps");
-        System.out.println(platformsLevel1.size());
+        }, 0, 20); // Adjust the delay as needed\
 
         // Add the KeyListener to the game panel
         addKeyListener(this);
@@ -184,6 +147,9 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
 
     private Platform lastPlatformLevel2;
 
+    /**
+     * Generates platforms and other game elements for Level 1.
+     */
     public void generateLevel1() {
         int platformWidth = 120 + random.nextInt(20);
         int platformHeight = 50;
@@ -207,7 +173,6 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         int randomIndex = random.nextInt(trapY.length);
         String randomTrapY = trapY[randomIndex];
         if (System.currentTimeMillis() - lastTrap >= 3000) {
-            //System.out.println(randomTrapY);
             if (randomTrapY.equals("385") && lastPlatformLevel2 != null) {
                 // Generate the trap on the last platform of Level 2 if trapY is "385"
                 Trap trap = new Trap(lastPlatformLevel2.getX(), 
@@ -222,11 +187,11 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
                 lastTrap = System.currentTimeMillis();
             }
         }
-
-        //System.out.println("l1 called");
-        
     }
 
+    /**
+     * Generates platforms and other game elements for Level 2.
+     */
     public void generateLevel2() {
         int platformWidth = 70 + random.nextInt(20);
         int platformHeight = 50;
@@ -242,10 +207,12 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
             Coin coin = new Coin(coinX, coinY);
             coins.add(coin);
         }
-        
-        //System.out.println("l2 called");
     }
 
+    /**
+     * The main game loop logic. Handles character movement, collision detection,
+     * and element generation.
+     */
     @Override
     public void actionPerformed(ActionEvent e) {
         if (isJumping) {
@@ -290,7 +257,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
                 // Character is colliding with the platform
                 if (characterY > 505 && characterY <= 518) {
                     checkScore();
-                    new GameOverMenu(collectedCoins, highScore);
+                    new GameOverMenu(collectedCoins, highScore, frame);
                     timer.cancel();
                 }
 
@@ -335,15 +302,8 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
                 // Character is colliding with the platform
                 if (characterY > 330 && characterY < 405) {
                     checkScore();
-                    new GameOverMenu(collectedCoins, highScore);
+                    new GameOverMenu(collectedCoins, highScore, frame);
                     timer.cancel();
-                }
-
-                // TO SOLVE 
-                if (isJumping && characterY - 87 == platform.getY()) {
-                    characterY = platform.getY() + 88;
-                    isJumping = false;
-                    jumpHeight = 0;
                 }
 
                 if (!isJumping && characterY < platform.getY()) {
@@ -387,6 +347,9 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         repaint();
     }
 
+    /**
+     * Handles the rendering of game elements on the game panel.
+     */
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -432,15 +395,17 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         g.drawImage(staticCoinImg, getWidth() - 140, 30, this);
 
         g.drawString(String.valueOf(collectedCoins), getWidth() - 100, 54);
-        g.drawString(String.valueOf(characterY), getWidth() - 300, 100);
-        g.drawString(String.valueOf(lifeBar), getWidth() - 350, 100);
 
+        g.setColor(Color.RED);
         g.setColor(Color.RED);
 
         healthBar.setValue(lifeBar);
-        g.setColor(Color.RED);
     }
 
+    /**
+     * Handles key press events for player interactions.
+     * @param e The key event object representing the key press.
+     */
     @Override
     public void keyPressed(KeyEvent e) {
         int key = e.getKeyCode();
@@ -473,21 +438,32 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         }
     }
     
-
+    /**
+     * Check for collisions between the player character and traps.
+     * Handles collisions.
+     */
     private void checkTrapCollision() {
         Rectangle characterRect = new Rectangle(characterX, characterY, 87, 87);
         Iterator<Trap> iterator = traps.iterator();
         while (iterator.hasNext()) {
             Trap trap = iterator.next();
             Rectangle trapRect = new Rectangle(trap.getX(), trap.getY(), 30, 30);
+
+            if (System.currentTimeMillis() - lastIncrease >= 1000) {
+                if (lifeBar < 100) {
+                    lifeBar += 1; // Increase the life bar by 1 every second
+                }
+                lastIncrease = System.currentTimeMillis();
+            }
+
             if (characterRect.intersects(trapRect) && !isInjured) {
-                lifeBar -= 10; // Decrease the life bar by 10
+                lifeBar -= 20; // Decrease the life bar by 20
                 if (lifeBar == 0) {
                     checkScore();
-                    new GameOverMenu(collectedCoins, highScore);
+                    new GameOverMenu(collectedCoins, highScore, frame);
                     timer.cancel();
                 }
-                
+
                 isInjured = true;
                 Timer injuredTime = new Timer();
 
@@ -502,7 +478,10 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         }
     }
 
-
+    /**
+     * Reads the high score from a file.
+     * Returns a string representing the high score in the format "name:score".
+     */
     public String getHighScore() { 
         FileReader readFile = null;
         BufferedReader reader = null;
@@ -524,8 +503,10 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         }
     }
 
+    /**
+     * Checks and updates the player's high score if a new high score is achieved.
+     */
     public void checkScore() {
-        System.out.println(highScore);
         if (highScore.equals("")) {
             return;
         }
@@ -568,6 +549,9 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         }
     }
 
+    /**
+     * Initializes the player's high score.
+     */
     public void initScore() {
         if (highScore.equals("nobody:0")) {
             highScore = this.getHighScore();

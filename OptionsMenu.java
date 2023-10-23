@@ -13,14 +13,21 @@ import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+/**
+ * The 'OptionsMenu' class represents the options menu frame used for adjusting the music volume.
+ */
 public class OptionsMenu extends JPanel {
     JSlider slider = new JSlider();
 
     protected Image closeBckgr = new ImageIcon("src\\closeButton.png").getImage();
     protected Image optionsBkg = new ImageIcon("src\\volumeBkg.png").getImage();
+    protected Image iconImg = new ImageIcon("src\\iconImg.png").getImage();
 
     MusicPlayer music = new MusicPlayer();
 
+    /**
+     * OptionsMenu constructor that initializes the options frame and sets the music volume.
+     */
     OptionsMenu(MusicPlayer music) {
         this.music = music;
 
@@ -30,6 +37,7 @@ public class OptionsMenu extends JPanel {
         optionsFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         optionsFrame.setUndecorated(true);
         optionsFrame.getRootPane().setWindowDecorationStyle(JRootPane.NONE);
+        optionsFrame.setIconImage(iconImg);
 
         optionsFrame.setShape(new RoundRectangle2D.Double(0, 0, 500, 250, 50, 50));
 

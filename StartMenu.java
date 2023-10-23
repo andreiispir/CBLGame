@@ -11,12 +11,16 @@ import javax.swing.JPanel;
 import javax.swing.JRootPane;
 import javax.swing.JSlider;
 
+/**
+ * This class represents the implementation of the Start Menu of the game.
+ */
 public class StartMenu extends JPanel {
     
     protected Image menuBackground = new ImageIcon("src\\startMenuBkg.png").getImage();
     protected Image closeBckgr = new ImageIcon("src\\closeButton.png").getImage();
     protected Image optionsButton = new ImageIcon("src\\optionsButton.png").getImage();
     protected Image newGameButton = new ImageIcon("src\\newGameButton.png").getImage();
+    protected Image iconImg = new ImageIcon("src\\iconImg.png").getImage();
 
     JSlider slider;
     MusicPlayer music = new MusicPlayer();
@@ -25,6 +29,9 @@ public class StartMenu extends JPanel {
 
     int currentVolume;
 
+    /**
+     * StartMenu constructor that initializes the frame with the specified parameters.
+     */
     StartMenu() {
         JFrame startGame = new JFrame("Gravity Dash");
         startGame.setSize(600, 400);
@@ -33,6 +40,7 @@ public class StartMenu extends JPanel {
         startGame.add(this);
         startGame.setUndecorated(true);
         startGame.getRootPane().setWindowDecorationStyle(JRootPane.NONE);
+        startGame.setIconImage(iconImg);
 
         startGame.setShape(new RoundRectangle2D.Double(0, 0, 600, 400, 50, 50));
 
@@ -124,6 +132,9 @@ public class StartMenu extends JPanel {
                 
     }
     
+    /**
+     * This method plays the specific music for StartMenu and GamePanel.
+     */
     public void playMusic(URL url) {
         music.setFile(url);
         music.play(url);
