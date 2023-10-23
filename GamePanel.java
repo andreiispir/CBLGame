@@ -145,9 +145,12 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         
             healthBar.setVisible(true);
 
+            frame.add(healthBar);
             label.add(healthBar);
             label.setVisible(true);
             frame.setVisible(true);
+
+
 
         });        
         

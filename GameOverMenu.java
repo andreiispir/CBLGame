@@ -55,11 +55,11 @@ public class GameOverMenu  {
         hScore.setBounds(165, 54, 300, 300);
 
         JButton retryButton = new JButton("Retry") {
-            // @Override
-            // protected void paintComponent(Graphics g) {
-            //     super.paintComponent(g);
-            //     //g.drawImage(retryImg, 0, 0, getWidth(), getHeight(), this);
-            // }
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                g.drawImage(retryImg, 0, 0, getWidth(), getHeight(), this);
+            }
         };
 
         // retryButton.setOpaque(false);
