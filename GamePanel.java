@@ -567,5 +567,4 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
     public void keyTyped(KeyEvent e) {
         // Unused for this example
     }
-
 }
